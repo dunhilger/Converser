@@ -2,6 +2,9 @@
 
 namespace Converser.Services
 {
+    /// <summary>
+    /// Сервис для обработки данных и создания XML-фидов Яндекс и 2ГИС.
+    /// </summary>
     public class MainService : IMainService
     {
         private readonly ILogger<MainService> _logger;
@@ -10,6 +13,14 @@ namespace Converser.Services
         private readonly IYandexFeedCreatorService _yandexFeedCreatorService;
         private readonly ITwoGisFeedCreatorService _twoGisFeedCreatorService;
 
+        /// <summary>
+        /// Инициализирует экземпляр класса MainService.
+        /// </summary>
+        /// <param name="logger">Интерфейс логгера</param>
+        /// <param name="parser">Интерфейс сервиса парсера</param>
+        /// <param name="separator">Интерфейс сервиса сепаратора</param>
+        /// <param name="yandexFeedCreatorService">Интерфейс сервиса для создания XML-фидов Яндекс</param>
+        /// <param name="twoGisFeedCreatorService">Интерфейс сервиса для создания XML-фидов 2ГИС</param>
         public MainService(ILogger<MainService> logger,
             IExcelParserService parser,
             ICitySeparatorService separator,
@@ -23,6 +34,10 @@ namespace Converser.Services
             _twoGisFeedCreatorService = twoGisFeedCreatorService;
         }
 
+        /// <summary>
+        /// Запускает обработку данных и создание XML-фидов.
+        /// </summary>
+        /// <param name="path">Путь к файлу Excel</param>
         public void Run(string path)
         {
             _logger.LogInformation("Старт.");
@@ -33,23 +48,11 @@ namespace Converser.Services
             // разбивка списка по городам
             var cityDictionary = _separator.SeparateByCity(products);
 
-            //// разбивка списка по городам
-            //var citySeparator = new CitySeparatorService(null);
-            //var cityDictionary = citySeparator.SeparateByCity(products);
-
             // создание фидов яндекс
             _yandexFeedCreatorService.CreateXml(path, cityDictionary);
 
-            // создание фидов яндекс
-            //var xmlYandex = new YandexFeedCreatorService(cityDictionary);
-            //xmlYandex.CreateXml(parser.XlsxFilePath);
-
             // создание фидов 2ГИС
             _twoGisFeedCreatorService.CreateXml(path, cityDictionary);
-
-            // создание фидов 2ГИС
-            /* var xmlTwoGis = new TwoGisFeedCreatorService(cityDictionary);
-            xmlTwoGis.CreateXml(parser.XlsxFilePath);*/
 
             // C:\Users\Farad\Desktop\фид ноябрь.xlsx
 

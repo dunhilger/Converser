@@ -4,16 +4,29 @@ using Microsoft.Extensions.Logging;
 
 namespace Converser.Services
 {
+    /// <summary>
+    /// Сервис для создания XML-фидов 2ГИС.
+    /// </summary>
     public class TwoGisFeedCreatorService : ITwoGisFeedCreatorService
     {
         private readonly ILogger<TwoGisFeedCreatorService> _logger;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса TwoGisFeedCreatorService.
+        /// </summary>
+        /// <param name="logger">Интерфейс логгера</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public TwoGisFeedCreatorService(ILogger<TwoGisFeedCreatorService> logger)
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Создает XML-фиды для 2ГИС на основе данных о товарах по городам.
+        /// </summary>
+        /// <param name="path">Путь к файлу Excel</param>
+        /// <param name="citySeparatorResult">Результат разделения товаров по городам</param>
         public void CreateXml(string path, CitySeparatorResult citySeparatorResult)
         {
             var directoryPath = Path.Combine(Path.GetDirectoryName(path), "TwoGisFeeds");
@@ -26,7 +39,6 @@ namespace Converser.Services
             {
                 if (!citySeparatorResult.CityProducts.ContainsKey(city.CityName))
                 {
-                    //Console.WriteLine($"Город {city.CityName} не найден в Excel.");
                     _logger.LogError("Город '{0a}' не найден в Excel.", city.CityName);
                     continue;
                 }
@@ -50,6 +62,12 @@ namespace Converser.Services
             }
         }
 
+        /// <summary>
+        /// Создает XML-узел shop
+        /// </summary>
+        /// <param name="cityName">Имя города</param>
+        /// <param name="citySeparatorResult">Результат разделения товаров по городам</param>
+        /// <returns></returns>
         private Shop CreateShop(string cityName, CitySeparatorResult citySeparatorResult)
         {
             var shop = new Shop
@@ -67,6 +85,12 @@ namespace Converser.Services
             return shop;
         }
 
+        /// <summary>
+        /// Создает XML-узел offers с оферами в пределах города
+        /// </summary>
+        /// <param name="cityName">Имя города</param>
+        /// <param name="citySeparatorResult">Результат разделения товаров по городам</param>
+        /// <returns>Список оферов offers</returns>
         private List<Offer> CreateOffers(string cityName, CitySeparatorResult citySeparatorResult)
         {
             if (citySeparatorResult.CityProducts.TryGetValue(cityName, out var cityProducts))

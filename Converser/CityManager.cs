@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Converser
 {
     /// <summary>
-    /// Класс менеджера городов
+    /// Менеджер городов
     /// </summary>
     public class CityManager
     {
         /// <summary>
-        /// Возвращает список городов
+        /// Возвращает список городов из Json
         /// </summary>
         /// <returns>Список городов</returns>
         public List<City> GetCities()

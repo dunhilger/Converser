@@ -3,9 +3,14 @@ using OfficeOpenXml;
 
 namespace Converser
 {
+    /// <summary>
+    /// Сервис для парсинга данных из файла Excel и создания списка продуктов.
+    /// </summary>
     public class ExcelParserService : IExcelParserService
     {
-        // перечисление со списком полей, ожидаемым из файла Excel
+        /// <summary>
+        /// Перечисление со списком полей, ожидаемых из файла Excel
+        /// </summary>
         enum Field
         {
             Model,
@@ -24,11 +29,21 @@ namespace Converser
             ParentCategoryName,
         }
 
-        // словарь для сопоставления полей из Enum Field с объектами типа FielaData
+        /// <summary>
+        /// Содержит словарь для сопоставления полей из Enum Field с объектами типа FielaData.
+        /// </summary>
         private readonly Dictionary<Field, FieldData> _fields;
 
+        /// <summary>
+        /// Поле для ведения логов в контексте сервиса парсинга Excel.
+        /// </summary>
         private readonly ILogger<ExcelParserService> _logger;
 
+        /// <summary>
+        /// Инициализирует экземпляр класса ExcelParserService.
+        /// </summary>
+        /// <param name="logger">Интерфейс логгера</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ExcelParserService(ILogger<ExcelParserService> logger)
         {
             _logger = logger ??
@@ -44,9 +59,9 @@ namespace Converser
             var quantity = new FieldData(14, "Quantity", (v, p) => p.Quantity = GetNumericValue(v));
             var description = new FieldData(9, "Description", (v, p) => p.Description = v);
             var japaneseCuisineStation = new FieldData(24, "JapaneseCuisineStation",
-                (v, p) => p.JapaneseCuisineStation = GetIntValue(v));
+                (v, p) => p.JapaneseCuisineStationQuantity = GetIntValue(v));
             var panasianCuisineStation = new FieldData(25, "PanasianCuisineStation",
-                (v, p) => p.PanasianCuisineStation = GetIntValue(v));
+                (v, p) => p.PanasianCuisineStationQuantity = GetIntValue(v));
             var categoryName = new FieldData(8, "CategoryName", (v, p) => p.CategoryName = v);
             var parentCategoryId = new FieldData(27, "ParentCategoryId", (v, p) => p.ParentCategoryId = v);
             var parentCategoryName = new FieldData(28, "ParentCategoryName", (v, p) => p.ParentCategoryName = v);
@@ -70,7 +85,11 @@ namespace Converser
             };
         }
 
-        // преобразование текстового значения в числовое значение с фиксированным форматом
+        /// <summary>
+        /// Преобразует текстовое значения в числовое с фиксированным форматом
+        /// </summary>
+        /// <param name="value">Значение из ячейки Excel</param>
+        /// <returns></returns>
         private string GetNumericValue(string value)
         {
             var dotIndex = value.IndexOf('.');
@@ -83,14 +102,17 @@ namespace Converser
             }
             else
             {
-                //Console.WriteLine($"Ошибка при преобразовании значения {value} в число.");
                 _logger.LogError("Ошибка преобразования значения '{0a}' в число.", value);
             }
 
             return string.Empty;
         }
 
-        // преобразование строкового значения в целочисленное значение int
+        /// <summary>
+        /// Преобразует строковое значения в целочисленное int
+        /// </summary>
+        /// <param name="value">Значение из ячейки Excel</param>
+        /// <returns></returns>
         private int? GetIntValue(string value)
         {
             if (int.TryParse(value, out int intValue))
@@ -99,14 +121,17 @@ namespace Converser
             }
             else
             {
-                //Console.WriteLine($"Ошибка при преобразовании значения {value} в int.");
                 _logger.LogError("Ошибка при преобразовании значения '{0a}' в int", value);
             }
 
             return null;
         }
 
-        // парсинг файла Excel
+        /// <summary>
+        /// Получает данные из файла Excel и возвращает список продуктов.
+        /// </summary>
+        /// <param name="path">Путь к файлу Excel</param>
+        /// <returns></returns>
         public List<Product> GetXLSXFile(string path)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -147,7 +172,13 @@ namespace Converser
             return products;
         }
 
-        // получение значения из ячейки файла Excel
+        /// <summary>
+        /// Получает значения из ячейки файла Excel.
+        /// </summary>
+        /// <param name="worksheet">Лист Excel</param>
+        /// <param name="row">Строка</param>
+        /// <param name="column">Столбец</param>
+        /// <returns>Значение ячейки или пустая строка, если значение равно "NULL"</returns>
         private static string GetCellValue(ExcelWorksheet worksheet, int row, int column)
         {
             var cellValue = worksheet.Cells[row, column].Value?.ToString().Trim() ?? string.Empty;
@@ -155,7 +186,13 @@ namespace Converser
             return cellValue.Equals("NULL", StringComparison.OrdinalIgnoreCase) ? string.Empty : cellValue;
         }
 
-        // установка значения в поле Product в соответствии с данными из поля FieldData
+        /// <summary>
+        /// Устанавливает значение поля в объекте Product, используя данные из указанной ячейки файла Excel из FieldData.
+        /// </summary>
+        /// <param name="worksheet">Лист Excel</param>
+        /// <param name="row">Строка</param>
+        /// <param name="fieldData">Данные о поле, включая позицию и метод обработки</param>
+        /// <param name="product">Объект Product, в который будет установлено значение поля</param>
         private void SetFieldValue(ExcelWorksheet worksheet, int row, FieldData fieldData, Product product)
         {
             var column = fieldData.Position;
@@ -168,12 +205,18 @@ namespace Converser
             }
             else
             {
-                //Console.WriteLine($"Отсутствует значение. Поле эксель: {worksheet.Cells[row, column].Address}");
                 _logger.LogError("Отсутствует значение в ячейке Excel '{a0}'", worksheet.Cells[row, column].Address);
             }
         }
 
-        // проверка существования файла Excel по указанной директории
+        /// <summary>
+        /// Проверяет существования файла Excel в указанной директории
+        /// </summary>
+        /// <param name="path">Путь к файлу Excel</param>
+        /// <returns>
+        /// <c>true</c>, если файл существует.
+        /// <c>false</c>, если файл не существует.
+        /// </returns>
         private static bool CheckDirectory(string path)
         {
             if (!File.Exists(path))
@@ -186,9 +229,17 @@ namespace Converser
             return true;
         }
 
-        // содержит данные о поле Excel(позиция, имя, метод для обработки данных этого поля)
+        /// <summary>
+        /// Класс, представляющий данные о поле Excel. Cодержит данные о поле Excel(позиция, имя, метод для обработки данных этого поля).
+        /// </summary>
         class FieldData
         {
+            /// <summary>
+            /// Инициализирует экземпляр класса FieldData
+            /// </summary>
+            /// <param name="position">Позиция поля в файле Excel</param>
+            /// <param name="name">Имя поля</param>
+            /// <param name="handler">Метод обработки данных этого поля</param>
             public FieldData(int position, string name, Action<string, Product> handler)
             {
                 Position = position;
@@ -196,15 +247,29 @@ namespace Converser
                 Handler = handler;
             }
 
+            /// <summary>
+            /// Обрабатывает значение поля, вызывая соответствующий метод обработки.
+            /// </summary>
+            /// <param name="value">Значение поля</param>
+            /// <param name="product">Продукт, которому будет установлено значение</param>
             public void HandleValue(string value, Product product)
             {
                 Handler?.Invoke(value, product);
             }
 
+            /// <summary>
+            /// Получает и устанавливает метод обработки данных этого поля.
+            /// </summary>
             public Action<string, Product> Handler { get; }
 
+            /// <summary>
+            /// Получает позицию поля в файле Excel.
+            /// </summary>
             public int Position { get; }
 
+            /// <summary>
+            /// Получает имя поля.
+            /// </summary>
             public string Name { get; }
         }
     }
