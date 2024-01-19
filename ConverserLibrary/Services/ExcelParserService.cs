@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ConverserLibrary.Interfaces;
+using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 
-namespace Converser
+namespace ConverserLibrary
 {
     /// <summary>
     /// Сервис для парсинга данных из файла Excel и создания списка продуктов.
@@ -138,11 +139,6 @@ namespace Converser
 
             var products = new List<Product>();
 
-            if (!CheckDirectory(path))
-            {
-                return null;
-            }
-
             using (var package = new ExcelPackage(new FileInfo(path)))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
@@ -207,26 +203,6 @@ namespace Converser
             {
                 _logger.LogError("Отсутствует значение в ячейке Excel '{adress}'", worksheet.Cells[row, column].Address);
             }
-        }
-
-        /// <summary>
-        /// Проверяет существования файла Excel в указанной директории
-        /// </summary>
-        /// <param name="path">Путь к файлу Excel</param>
-        /// <returns>
-        /// <c>true</c>, если файл существует.
-        /// <c>false</c>, если файл не существует.
-        /// </returns>
-        private static bool CheckDirectory(string path)
-        {
-            if (!File.Exists(path))
-            {
-                Console.WriteLine("Указанный файл не существует");
-                Console.WriteLine("Нажмите любую клавишу для завершения...");
-                Console.ReadKey();
-                return false;
-            }
-            return true;
         }
 
         /// <summary>

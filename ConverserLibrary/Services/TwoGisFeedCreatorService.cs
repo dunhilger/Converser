@@ -1,8 +1,9 @@
 ﻿using System.Xml.Serialization;
-using Converser.Models;
+using ConverserLibrary.Interfaces;
+using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Converser.Services
+namespace ConverserLibrary.Services
 {
     /// <summary>
     /// Сервис для создания XML-фидов 2ГИС.
@@ -29,7 +30,7 @@ namespace Converser.Services
         /// <param name="citySeparatorResult">Результат разделения товаров по городам</param>
         public void CreateXml(string path, CitySeparatorResult citySeparatorResult)
         {
-            var directoryPath = Path.Combine(Path.GetDirectoryName(path), "TwoGisFeeds");
+            var directoryPath = Path.Combine(path, "TwoGisFeeds");
             Directory.CreateDirectory(directoryPath);
 
             var cityManager = new CityManager();

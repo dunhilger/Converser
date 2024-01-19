@@ -1,7 +1,8 @@
-﻿using Converser.Models;
+﻿using ConverserLibrary.Interfaces;
+using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Converser
+namespace ConverserLibrary
 {
     /// <summary>
     /// Сервис для разделения списка товаров по городам и категориям.

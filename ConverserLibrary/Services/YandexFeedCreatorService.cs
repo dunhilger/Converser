@@ -1,6 +1,7 @@
 ﻿using System.Xml.Serialization;
-using Converser;
-using Converser.Models;
+using ConverserLibrary;
+using ConverserLibrary.Interfaces;
+using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
@@ -15,11 +16,13 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
     /// </summary>
     /// <param name="logger">Интерфейс логгера</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public YandexFeedCreatorService(ILogger<YandexFeedCreatorService> logger)
+    public YandexFeedCreatorService(ILogger<YandexFeedCreatorService> logger/*, IInformationService informationService*/)
     {
         _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
     }
+
+    public event EventHandler<XmlCreatedEventArgs> XmlCreated;
 
     /// <summary>
     /// Создает XML-фиды для Яндекс на основе данных о товарах по городам.
@@ -28,7 +31,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
     /// <param name="citySeparatorResult">Результат разделения товаров по городам</param>
     public void CreateXml(string path, CitySeparatorResult citySeparatorResult)
     {
-        var directoryPath = Path.Combine(Path.GetDirectoryName(path), "YandexFeeds");
+        var directoryPath = Path.Combine(path, "YandexFeeds");
         Directory.CreateDirectory(directoryPath);
 
         var cityManager = new CityManager();
@@ -58,6 +61,8 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
             {
                 serializer.Serialize(fileStream, catalog, nameSpace);
             }
+
+            XmlCreated?.Invoke(this, new XmlCreatedEventArgs(filePath));
         }
     }
 

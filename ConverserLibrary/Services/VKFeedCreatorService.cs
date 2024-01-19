@@ -1,35 +1,35 @@
-﻿using System.Xml.Serialization;
-using Converser.Models;
+﻿using ConverserLibrary.Interfaces;
+using System.Xml.Serialization;
+using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Converser.Services
+namespace ConverserLibrary.Services
 {
-    /// <summary>
-    /// Сервис для создания XML-фидов 2ГИС.
-    /// </summary>
-    public class TwoGisFeedCreatorService : ITwoGisFeedCreatorService
+    public class VKFeedCreatorService : IVKFeedCreatorService
     {
-        private readonly ILogger<TwoGisFeedCreatorService> _logger;
+        private readonly ILogger<VKFeedCreatorService> _logger;
 
         /// <summary>
-        /// Инициализирует новый экземпляр класса TwoGisFeedCreatorService.
+        /// Инициализирует новый экземпляр класса YandexFeedCreatorService.
         /// </summary>
         /// <param name="logger">Интерфейс логгера</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public TwoGisFeedCreatorService(ILogger<TwoGisFeedCreatorService> logger)
+        public VKFeedCreatorService(ILogger<VKFeedCreatorService> logger/*, IInformationService informationService*/)
         {
             _logger = logger ??
-                throw new ArgumentNullException(nameof(logger));
+                    throw new ArgumentNullException(nameof(logger));
         }
 
+        public event EventHandler<XmlCreatedEventArgs> XmlCreated;
+
         /// <summary>
-        /// Создает XML-фиды для 2ГИС на основе данных о товарах по городам.
+        /// Создает XML-фиды для VK на основе данных о товарах по городам.
         /// </summary>
         /// <param name="path">Путь к файлу Excel</param>
         /// <param name="citySeparatorResult">Результат разделения товаров по городам</param>
         public void CreateXml(string path, CitySeparatorResult citySeparatorResult)
         {
-            var directoryPath = Path.Combine(Path.GetDirectoryName(path), "TwoGisFeeds");
+            var directoryPath = Path.Combine(path, "VKFeeds");
             Directory.CreateDirectory(directoryPath);
 
             var cityManager = new CityManager();
@@ -45,7 +45,7 @@ namespace Converser.Services
 
                 var catalog = new Catalog
                 {
-                    Date = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss") + city.TimeZone,
+                    Date = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                     Shop = CreateShop(city.CityName, citySeparatorResult)
                 };
 
@@ -59,6 +59,8 @@ namespace Converser.Services
                 {
                     serializer.Serialize(fileStream, catalog, nameSpace);
                 }
+
+                XmlCreated?.Invoke(this, new XmlCreatedEventArgs(filePath));
             }
         }
 
@@ -74,7 +76,7 @@ namespace Converser.Services
             {
                 Name = "MYBOX",
                 Company = "MYBOX",
-                Url = "https://mybox.ru/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
+                Url = "https://mybox.ru",
                 Currencies = new List<Currency>
             {
                 new Currency { ID = "RUR", Rate = "1" }
@@ -82,6 +84,7 @@ namespace Converser.Services
                 Categories = citySeparatorResult.Categories,
                 Offers = CreateOffers(cityName, citySeparatorResult)
             };
+
             return shop;
         }
 
@@ -103,17 +106,14 @@ namespace Converser.Services
                     {
                         ID = product.BitrixCode,
                         Model = product.Model,
-                        Url = $"https://mybox.ru/products/{product.Url}",
                         Price = product.Price,
                         CurrencyId = product.Currency,
-                        CategoryId = product.CategoryId,
+                        CategoryId = product.CategoryId,                    
+                        Description = $@"{product.Description}<br/><br/>" +
+                        $"{product.Quantity} шт / {product.Weight} г<br/><br/>" +
+                        $"Цена может отличаться в зависимости от твоего города.<br/>" +
+                        $"Точную цену можно уточнить на сайте.<br/>",
                         Picture = product.Picture,
-                        Params = new List<Param>()
-                    {
-                        new Param() { Name = "Вес", Unit ="Грамм", Value = product.Weight },
-                        new Param() { Name = "Количество", Unit = "Штук", Value = product.Quantity }
-                    },
-                        Description = product.Description,
                     };
 
                     offers.Add(offer);
