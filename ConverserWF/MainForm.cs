@@ -185,7 +185,8 @@ namespace ConverserWF
                 }
                 else
                 {
-                    BrowseDirectoryImportField.Text = string.Empty;
+                    BrowseDirectoryImportField.Text = !string.IsNullOrEmpty(filePathImport) ? 
+                                                      filePathImport : "";
                 }
             }
         }
@@ -231,6 +232,22 @@ namespace ConverserWF
                 VKFeedButton.Enabled = false;
                 TwoGisFeedButton.Enabled = false;
             }
+        }
+
+        /// <summary>
+        /// Обработчик события Click для контрола сброса данных в диалоговых окнах.
+        /// </summary>
+        // <param name="sender">Объект, вызвавший событие.</param>
+        /// <param name="e">Аргументы события Click.</param>
+        public void FieldDataResetButton_Click(object sender, EventArgs e)
+        {
+            filePathExport = null;
+            filePathImport = null;
+            BrowseDirectoryExportField.Text = "";
+            BrowseDirectoryImportField.Text = "";
+            YandexFeedButton.Enabled = false;
+            VKFeedButton.Enabled = false;
+            TwoGisFeedButton.Enabled = false;
         }
 
         /// <summary>

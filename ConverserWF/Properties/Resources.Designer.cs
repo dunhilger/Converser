@@ -63,6 +63,16 @@ namespace ConverserWF.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap _1688108625_bogatyr_club_p_krestik_v_kruge_foni_krasivo_70 {
+            get {
+                object obj = ResourceManager.GetObject("1688108625_bogatyr-club-p-krestik-v-kruge-foni-krasivo-70", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap _2_GIS_Logo_Color_3afd005567 {
             get {
                 object obj = ResourceManager.GetObject("2_GIS_Logo_Color_3afd005567", resourceCulture);
@@ -76,6 +86,16 @@ namespace ConverserWF.Properties {
         internal static System.Drawing.Bitmap _2_GIS_Logo_Color_3afd0055671 {
             get {
                 object obj = ResourceManager.GetObject("2_GIS_Logo_Color_3afd0055671", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icons8_кнопка_с_крестиком_48 {
+            get {
+                object obj = ResourceManager.GetObject("icons8-кнопка-с-крестиком-48", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -40,6 +40,7 @@
             BrowseFileText = new Label();
             SaveFileText = new Label();
             BrowseDirectoryExportField = new TextBox();
+            FieldDataResetButton = new Button();
             SuspendLayout();
             // 
             // DisplayFileNameElement
@@ -86,9 +87,9 @@
             // 
             DirectoryImportButton.Location = new Point(703, 73);
             DirectoryImportButton.Name = "DirectoryImportButton";
-            DirectoryImportButton.Size = new Size(50, 29);
+            DirectoryImportButton.Size = new Size(36, 29);
             DirectoryImportButton.TabIndex = 6;
-            DirectoryImportButton.Text = ". . .";
+            DirectoryImportButton.Text = "...";
             DirectoryImportButton.UseVisualStyleBackColor = true;
             DirectoryImportButton.Click += BrowseFileImportDirectory_Click;
             // 
@@ -96,9 +97,9 @@
             // 
             DirectoryExportButton.Location = new Point(703, 158);
             DirectoryExportButton.Name = "DirectoryExportButton";
-            DirectoryExportButton.Size = new Size(50, 29);
+            DirectoryExportButton.Size = new Size(36, 29);
             DirectoryExportButton.TabIndex = 7;
-            DirectoryExportButton.Text = ". . .";
+            DirectoryExportButton.Text = "...";
             DirectoryExportButton.UseVisualStyleBackColor = true;
             DirectoryExportButton.Click += BrowseExportDirectory_Click;
             // 
@@ -143,12 +144,23 @@
             BrowseDirectoryExportField.TabIndex = 11;
             BrowseDirectoryExportField.Click += BrowseExportDirectory_Click;
             // 
+            // FieldDataResetButton
+            // 
+            FieldDataResetButton.Image = Properties.Resources.icons8_кнопка_с_крестиком_48;
+            FieldDataResetButton.Location = new Point(703, 113);
+            FieldDataResetButton.Name = "FieldDataResetButton";
+            FieldDataResetButton.Size = new Size(36, 34);
+            FieldDataResetButton.TabIndex = 12;
+            FieldDataResetButton.UseVisualStyleBackColor = true;
+            FieldDataResetButton.Click += FieldDataResetButton_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(9F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
             ClientSize = new Size(1071, 615);
+            Controls.Add(FieldDataResetButton);
             Controls.Add(BrowseDirectoryExportField);
             Controls.Add(SaveFileText);
             Controls.Add(BrowseFileText);
@@ -182,5 +194,6 @@
         private Label BrowseFileText;
         private Label SaveFileText;
         private TextBox BrowseDirectoryExportField;
+        private Button FieldDataResetButton;
     }
 }
