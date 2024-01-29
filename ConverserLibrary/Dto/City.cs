@@ -1,4 +1,4 @@
-﻿namespace ConverserLibrary
+﻿namespace ConverserLibrary.Dto
 {
     /// <summary>
     /// Город для сериализации в Json.

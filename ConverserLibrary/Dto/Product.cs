@@ -1,4 +1,4 @@
-﻿namespace ConverserLibrary
+﻿namespace ConverserLibrary.Dto
 {
     /// <summary>
     /// Единица товара/sku.

@@ -1,11 +1,12 @@
-﻿using System.Text.Json;
+﻿using ConverserLibrary.Dto;
+using System.Text.Json;
 
 namespace ConverserLibrary
 {
     /// <summary>
     /// Менеджер городов
     /// </summary>
-    public class CityManager
+    public class JsonDataReader
     {
         /// <summary>
         /// Возвращает список городов из Json
@@ -16,6 +17,17 @@ namespace ConverserLibrary
             string json = File.ReadAllText("CitiesTimeZoneUTC.json");
 
             return JsonSerializer.Deserialize<List<City>>(json);
+        }
+
+        /// <summary>
+        /// Возвращает список utm меток
+        /// </summary>
+        /// <returns>Список utm меток</returns>
+        public List<UtmLabel> GetUtmLabels()
+        {
+            string json = File.ReadAllText("UTMLabels.json");
+
+            return JsonSerializer.Deserialize<List<UtmLabel>>(json);
         }
     }
 }

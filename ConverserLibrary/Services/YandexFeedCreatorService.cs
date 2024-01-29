@@ -34,7 +34,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
         var directoryPath = Path.Combine(path, "YandexFeeds");
         Directory.CreateDirectory(directoryPath);
 
-        var cityManager = new CityManager();
+        var cityManager = new JsonDataReader();
         var jsonCities = cityManager.GetCities();
 
         foreach (var city in jsonCities)

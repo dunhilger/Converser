@@ -1,4 +1,5 @@
-﻿using ConverserLibrary.Interfaces;
+﻿using ConverserLibrary.Dto;
+using ConverserLibrary.Interfaces;
 using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 
@@ -33,8 +34,8 @@ namespace ConverserLibrary
             var cityDictionary = new Dictionary<string, List<Product>>();
             var categoryDictionary = new Dictionary<string, Category>();
 
-            var cityManager = new CityManager();
-            List<City> allExistCities = cityManager.GetCities();
+            var jsonDataReader = new JsonDataReader();
+            List<City> allExistCities = jsonDataReader.GetCities();
 
             var excludedCategoryIds = new List<string> { "90", "35", "38" }; // набор костылей
 

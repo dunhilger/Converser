@@ -33,8 +33,8 @@ namespace ConverserLibrary.Services
             var directoryPath = Path.Combine(path, "TwoGisFeeds");
             Directory.CreateDirectory(directoryPath);
 
-            var cityManager = new CityManager();
-            var jsonCities = cityManager.GetCities();
+            var jsonDataReader = new JsonDataReader();
+            var jsonCities = jsonDataReader.GetCities();
 
             foreach (var city in jsonCities)
             {
@@ -75,7 +75,7 @@ namespace ConverserLibrary.Services
             {
                 Name = "MYBOX",
                 Company = "MYBOX",
-                Url = "https://mybox.ru/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
+                Url = "https://mybox.ru/",
                 Currencies = new List<Currency>
             {
                 new Currency { ID = "RUR", Rate = "1" }
@@ -104,7 +104,7 @@ namespace ConverserLibrary.Services
                     {
                         ID = product.BitrixCode,
                         Model = product.Model,
-                        Url = $"https://mybox.ru/products/{product.Url}",
+                        Url = $"https://mybox.ru/products/{product.Url}/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
                         Price = product.Price,
                         CurrencyId = product.Currency,
                         CategoryId = product.CategoryId,

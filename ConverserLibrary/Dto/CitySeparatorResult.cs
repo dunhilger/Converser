@@ -1,4 +1,5 @@
-﻿using ConverserLibrary.Models;
+﻿using ConverserLibrary.Dto;
+using ConverserLibrary.Models;
 
 namespace ConverserLibrary
 {

@@ -2,6 +2,7 @@
 using System.Xml.Serialization;
 using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace ConverserLibrary.Services
 {
@@ -32,8 +33,8 @@ namespace ConverserLibrary.Services
             var directoryPath = Path.Combine(path, "VKFeeds");
             Directory.CreateDirectory(directoryPath);
 
-            var cityManager = new CityManager();
-            var jsonCities = cityManager.GetCities();
+            var jsonDataReader = new JsonDataReader();
+            var jsonCities = jsonDataReader.GetCities();
 
             foreach (var city in jsonCities)
             {
@@ -99,20 +100,42 @@ namespace ConverserLibrary.Services
             if (citySeparatorResult.CityProducts.TryGetValue(cityName, out var cityProducts))
             {
                 var offers = new List<Offer>();
+                var jsonDataReader = new JsonDataReader();
+                var utmLabels = jsonDataReader.GetUtmLabels();
 
                 foreach (var product in cityProducts)
                 {
+                    var descriptionBuilder = new StringBuilder();
+
+                    descriptionBuilder.AppendLine(product.Description);
+                    descriptionBuilder.AppendLine("<br/>");
+                    descriptionBuilder.AppendLine("<br/>");
+                    descriptionBuilder.AppendLine($"{product.Quantity} шт / {product.Weight} г");
+                    descriptionBuilder.AppendLine("<br/>");
+                    descriptionBuilder.AppendLine("<br/>");
+                    descriptionBuilder.AppendLine("Цена может отличаться в зависимости от твоего города.");
+                    descriptionBuilder.AppendLine("<br/>");
+                    descriptionBuilder.AppendLine("<br/>");
+                    descriptionBuilder.AppendLine("Точную цену можно уточнить на сайте.");
+
+                    var matchingUtmLabel = utmLabels.FirstOrDefault(label => label.CategoryId == product.CategoryId);
+
+                    if (matchingUtmLabel is not null)
+                    {
+                        descriptionBuilder.AppendLine("<br/>");
+                        descriptionBuilder.AppendLine("<br/>");
+                        descriptionBuilder.AppendLine(matchingUtmLabel.CategoryUTMLabel);
+                    }
+
+                    var description = descriptionBuilder.ToString();
                     var offer = new Offer
                     {
                         ID = product.BitrixCode,
-                        Model = product.Model,
-                        Price = product.Price,
+                        Price = product.Price,                                          
                         CurrencyId = product.Currency,
-                        CategoryId = product.CategoryId,                    
-                        Description = $@"{product.Description}<br/><br/>" +
-                        $"{product.Quantity} шт / {product.Weight} г<br/><br/>" +
-                        $"Цена может отличаться в зависимости от твоего города.<br/>" +
-                        $"Точную цену можно уточнить на сайте.<br/>",
+                        CategoryId = product.CategoryId,
+                        Model = product.Model,
+                        Description = description,
                         Picture = product.Picture,
                     };
 

@@ -1,0 +1,97 @@
+﻿[
+	{
+		"CategoryName": "Суши",
+		"CategoryId": "2",
+		"CategoryUTMLabel": "https://clck.ru/34ivKe"
+	},
+	{
+		"CategoryName": "Классические роллы",
+		"CategoryId": "3",
+		"CategoryUTMLabel": "https://clck.ru/38LQmt"
+	},
+	{
+		"CategoryName": "Фирменные роллы MYBOX",
+		"CategoryId": "4",
+		"CategoryUTMLabel": "https://clck.ru/34ivDW"
+	},
+	{
+		"CategoryName": "Запеченные роллы",
+		"CategoryId": "5",
+		"CategoryUTMLabel": "https://clck.ru/38LTsT"
+	},
+	{
+		"CategoryName": "Сеты",
+		"CategoryId": "7",
+		"CategoryUTMLabel": "https://clck.ru/34iv9Q"
+	},
+	{
+		"CategoryName": "Пицца",
+		"CategoryId": "35",
+		"CategoryUTMLabel": "https://clck.ru/38LUwS"
+	},
+	{
+		"CategoryName": "Соусы",
+		"CategoryId": "38",
+		"CategoryUTMLabel": "https://clck.ru/34iwXD"
+	},
+	{
+		"CategoryName": "Бизнес-ланчи",
+		"CategoryId": "54",
+		"CategoryUTMLabel": "https://clck.ru/38LU9E"
+	},
+	{
+		"CategoryName": "Горячие блюда",
+		"CategoryId": "63",
+		"CategoryUTMLabel": "https://clck.ru/34iw6V"
+	},
+	{
+		"CategoryName": "Супы",
+		"CategoryId": "74",
+		"CategoryUTMLabel": "https://clck.ru/38LULp"
+	},
+	{
+		"CategoryName": "Для стиля и настроения",
+		"CategoryId": "80",
+		"CategoryUTMLabel": "https://clck.ru/38LVDA"
+	},
+	{
+		"CategoryName": "Горячие роллы",
+		"CategoryId": "85",
+		"CategoryUTMLabel": "https://clck.ru/34ivGm"
+	},
+	{
+		"CategoryName": "Вок лапша и рис",
+		"CategoryId": "86",
+		"CategoryUTMLabel": "https://clck.ru/34iv4p"
+	},
+	{
+		"CategoryName": "Поке",
+		"CategoryId": "87",
+		"CategoryUTMLabel": "https://clck.ru/38LUXJ"
+	},
+	{
+		"CategoryName": "Салаты",
+		"CategoryId": "88",
+		"CategoryUTMLabel": "https://clck.ru/38LUc8"
+	},
+	{
+		"CategoryName": "Десерты",
+		"CategoryId": "89",
+		"CategoryUTMLabel": "https://clck.ru/34iwVy"
+	},
+	{
+		"CategoryName": "Напитки",
+		"CategoryId": "90",
+		"CategoryUTMLabel": "https://clck.ru/38LUk8"
+	},
+	{
+		"CategoryName": "Закуски",
+		"CategoryId": "91",
+		"CategoryUTMLabel": "https://clck.ru/38LUpm"
+	},
+	{
+		"CategoryName": "Суширрито",
+		"CategoryId": "92",
+		"CategoryUTMLabel": "https://clck.ru/34iwMA"
+	}
+]

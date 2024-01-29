@@ -1,4 +1,6 @@
-﻿namespace ConverserLibrary.Interfaces
+﻿using ConverserLibrary.Dto;
+
+namespace ConverserLibrary.Interfaces
 {
     /// <summary>
     /// Интерфейс для сервиса парсера файлов Excel.

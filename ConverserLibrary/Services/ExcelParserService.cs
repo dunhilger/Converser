@@ -1,4 +1,5 @@
-﻿using ConverserLibrary.Interfaces;
+﻿using ConverserLibrary.Dto;
+using ConverserLibrary.Interfaces;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 
