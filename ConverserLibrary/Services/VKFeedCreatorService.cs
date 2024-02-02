@@ -126,6 +126,10 @@ namespace ConverserLibrary.Services
                         descriptionBuilder.AppendLine("<br/>");
                         descriptionBuilder.AppendLine(matchingUtmLabel.CategoryUTMLabel);
                     }
+                    else
+                    {
+                        _logger.LogError("Ошибка: Для категории '{CategoryName}' UTM метка не найдена.", matchingUtmLabel.CategoryName);
+                    }
 
                     var description = descriptionBuilder.ToString();
                     var offer = new Offer

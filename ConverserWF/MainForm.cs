@@ -1,7 +1,6 @@
 using ConverserLibrary;
 using ConverserLibrary.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
 namespace ConverserWF
 {
