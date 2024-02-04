@@ -11,16 +11,19 @@ namespace ConverserLibrary
     public class CitySeparatorService : ICitySeparatorService
     {
         private readonly ILogger<CitySeparatorService> _logger;
+        private readonly IInfoDataService _infoDataService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса CitySeparatorService.
         /// </summary>
         /// <param name="logger">Интерфейс логгера</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public CitySeparatorService(ILogger<CitySeparatorService> logger)
+        public CitySeparatorService(ILogger<CitySeparatorService> logger,
+            IInfoDataService infoDataService)
         {
             _logger = logger ?? 
                 throw new ArgumentNullException(nameof(logger));
+            _infoDataService = infoDataService;
         }
 
         /// <summary>
@@ -34,8 +37,7 @@ namespace ConverserLibrary
             var cityDictionary = new Dictionary<string, List<Product>>();
             var categoryDictionary = new Dictionary<string, Category>();
 
-            var jsonDataReader = new JsonDataReader();
-            List<City> allExistCities = jsonDataReader.GetCities();
+            List<City> allExistCities = _infoDataService.GetCities();
 
             var excludedCategoryIds = new List<string> { "90", "35", "38" }; // набор костылей
 

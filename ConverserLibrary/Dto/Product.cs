@@ -36,11 +36,6 @@
         public string Model { get; set; }
 
         /// <summary>
-        /// Получает URL товара.
-        /// </summary>
-        public string Url { get; set; }
-
-        /// <summary>
         /// Получает цену товара.
         /// </summary>
         public string Price { get; set; }
@@ -58,7 +53,7 @@
         /// <summary>
         /// Получает изображение товара.
         /// </summary>
-        public string Picture { get; set; }
+        public string PictureLink { get; set; }
 
         /// <summary>
         /// Получает возможность самовывоза товара.

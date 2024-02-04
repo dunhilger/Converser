@@ -12,15 +12,19 @@ namespace ConverserLibrary.Services
     {
         private readonly ILogger<TwoGisFeedCreatorService> _logger;
 
+        private readonly ITransliterationService _transliterationService;
+
         /// <summary>
         /// Инициализирует новый экземпляр класса TwoGisFeedCreatorService.
         /// </summary>
         /// <param name="logger">Интерфейс логгера</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public TwoGisFeedCreatorService(ILogger<TwoGisFeedCreatorService> logger)
+        public TwoGisFeedCreatorService(ILogger<TwoGisFeedCreatorService> logger,
+               ITransliterationService transliterationService)
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
+            _transliterationService = transliterationService;
         }
 
         /// <summary>
@@ -33,7 +37,7 @@ namespace ConverserLibrary.Services
             var directoryPath = Path.Combine(path, "TwoGisFeeds");
             Directory.CreateDirectory(directoryPath);
 
-            var jsonDataReader = new JsonDataReader();
+            var jsonDataReader = new InfoDataService();
             var jsonCities = jsonDataReader.GetCities();
 
             foreach (var city in jsonCities)
@@ -96,19 +100,21 @@ namespace ConverserLibrary.Services
         {
             if (citySeparatorResult.CityProducts.TryGetValue(cityName, out var cityProducts))
             {
-                var offers = new List<Offer>();
+                var offers = new List<Offer>();                
 
                 foreach (var product in cityProducts)
                 {
+                    var transliteratedName = _transliterationService.Transliterate(product.Model);
+
                     var offer = new Offer
                     {
                         ID = product.BitrixCode,
                         Model = product.Model,
-                        Url = $"https://mybox.ru/products/{product.Url}/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
+                        Url = $"https://mybox.ru/products/{transliteratedName}/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
                         Price = product.Price,
                         CurrencyId = product.Currency,
                         CategoryId = product.CategoryId,
-                        Picture = product.Picture,
+                        Picture = product.PictureLink,
                         Params = new List<Param>()
                     {
                         new Param() { Name = "Вес", Unit ="Грамм", Value = product.Weight },

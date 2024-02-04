@@ -1,12 +1,13 @@
 ﻿using ConverserLibrary.Dto;
+using ConverserLibrary.Interfaces;
 using System.Text.Json;
 
-namespace ConverserLibrary
+namespace ConverserLibrary.Services
 {
     /// <summary>
     /// Менеджер городов
     /// </summary>
-    public class JsonDataReader
+    public class InfoDataService : IInfoDataService
     {
         /// <summary>
         /// Возвращает список городов из Json

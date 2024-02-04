@@ -25,6 +25,8 @@ namespace ConverserWF
                 .AddSingleton<IYandexFeedCreatorService, YandexFeedCreatorService>()
                 .AddSingleton<ITwoGisFeedCreatorService, TwoGisFeedCreatorService>()
                 .AddSingleton<IVKFeedCreatorService, VKFeedCreatorService>()
+                .AddSingleton<IInfoDataService, InfoDataService>()
+                .AddSingleton<ITransliterationService, TransliterationService>()
                 .AddSingleton<MainForm>()
                 .BuildServiceProvider();
 

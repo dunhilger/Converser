@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using ConverserLibrary.Dto;
 
 namespace ConverserLibrary.Services
 {
@@ -10,15 +11,19 @@ namespace ConverserLibrary.Services
     {
         private readonly ILogger<VKFeedCreatorService> _logger;
 
+        private readonly IInfoDataService _infoDataService;
+
         /// <summary>
         /// Инициализирует новый экземпляр класса YandexFeedCreatorService.
         /// </summary>
         /// <param name="logger">Интерфейс логгера</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public VKFeedCreatorService(ILogger<VKFeedCreatorService> logger/*, IInformationService informationService*/)
+        public VKFeedCreatorService(ILogger<VKFeedCreatorService> logger, 
+                                    IInfoDataService infoDataService)
         {
             _logger = logger ??
                     throw new ArgumentNullException(nameof(logger));
+            _infoDataService = infoDataService;
         }
 
         public event EventHandler<XmlCreatedEventArgs> XmlCreated;
@@ -33,8 +38,7 @@ namespace ConverserLibrary.Services
             var directoryPath = Path.Combine(path, "VKFeeds");
             Directory.CreateDirectory(directoryPath);
 
-            var jsonDataReader = new JsonDataReader();
-            var jsonCities = jsonDataReader.GetCities();
+            var jsonCities = _infoDataService.GetCities();
 
             foreach (var city in jsonCities)
             {
@@ -100,47 +104,21 @@ namespace ConverserLibrary.Services
             if (citySeparatorResult.CityProducts.TryGetValue(cityName, out var cityProducts))
             {
                 var offers = new List<Offer>();
-                var jsonDataReader = new JsonDataReader();
-                var utmLabels = jsonDataReader.GetUtmLabels();
+                var utmLabels = _infoDataService.GetUtmLabels();
 
                 foreach (var product in cityProducts)
                 {
-                    var descriptionBuilder = new StringBuilder();
+                    string description = GetDescription(utmLabels, product);
 
-                    descriptionBuilder.AppendLine(product.Description);
-                    descriptionBuilder.AppendLine("<br/>");
-                    descriptionBuilder.AppendLine("<br/>");
-                    descriptionBuilder.AppendLine($"{product.Quantity} шт / {product.Weight} г");
-                    descriptionBuilder.AppendLine("<br/>");
-                    descriptionBuilder.AppendLine("<br/>");
-                    descriptionBuilder.AppendLine("Цена может отличаться в зависимости от твоего города.");
-                    descriptionBuilder.AppendLine("<br/>");
-                    descriptionBuilder.AppendLine("<br/>");
-                    descriptionBuilder.AppendLine("Точную цену можно уточнить на сайте.");
-
-                    var matchingUtmLabel = utmLabels.FirstOrDefault(label => label.CategoryId == product.CategoryId);
-
-                    if (matchingUtmLabel is not null)
-                    {
-                        descriptionBuilder.AppendLine("<br/>");
-                        descriptionBuilder.AppendLine("<br/>");
-                        descriptionBuilder.AppendLine(matchingUtmLabel.CategoryUTMLabel);
-                    }
-                    else
-                    {
-                        _logger.LogError("Ошибка: Для категории '{CategoryName}' UTM метка не найдена.", matchingUtmLabel.CategoryName);
-                    }
-
-                    var description = descriptionBuilder.ToString();
                     var offer = new Offer
                     {
                         ID = product.BitrixCode,
-                        Price = product.Price,                                          
+                        Price = product.Price,
                         CurrencyId = product.Currency,
                         CategoryId = product.CategoryId,
                         Model = product.Model,
                         Description = description,
-                        Picture = product.Picture,
+                        Picture = product.PictureLink,
                     };
 
                     offers.Add(offer);
@@ -150,6 +128,37 @@ namespace ConverserLibrary.Services
             }
 
             return new List<Offer>();
+        }
+
+        private string GetDescription(List<UtmLabel> utmLabels, Product product)
+        {
+            var descriptionBuilder = new StringBuilder();
+
+            descriptionBuilder.AppendLine(product.Description);
+            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine($"{product.Quantity} шт / {product.Weight} г");
+            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("Цена может отличаться в зависимости от твоего города.");
+            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("Точную цену можно уточнить на сайте.");
+
+            var matchingUtmLabel = utmLabels.FirstOrDefault(label => label.CategoryId == product.CategoryId);
+
+            if (matchingUtmLabel is not null)
+            {
+                descriptionBuilder.AppendLine("<br/>");
+                descriptionBuilder.AppendLine("<br/>");
+                descriptionBuilder.AppendLine(matchingUtmLabel.CategoryUTMLabel);
+            }
+            else
+            {
+                _logger.LogError("Ошибка: Для категории '{CategoryName}' UTM метка не найдена.", matchingUtmLabel.CategoryName);
+            }
+
+            return descriptionBuilder.ToString();
         }
     }
 }

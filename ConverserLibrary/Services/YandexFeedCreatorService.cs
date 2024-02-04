@@ -11,15 +11,23 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
 {
     private readonly ILogger<YandexFeedCreatorService> _logger;
 
+    private readonly IInfoDataService _infoDataService;
+    private readonly ITransliterationService _transliterationService;
+
     /// <summary>
     /// Инициализирует новый экземпляр класса YandexFeedCreatorService.
     /// </summary>
     /// <param name="logger">Интерфейс логгера</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public YandexFeedCreatorService(ILogger<YandexFeedCreatorService> logger/*, IInformationService informationService*/)
+    public YandexFeedCreatorService(
+        ILogger<YandexFeedCreatorService> logger,
+        IInfoDataService infoDataService, 
+        ITransliterationService transliterationService)
     {
         _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
+        _infoDataService = infoDataService;
+        _transliterationService = transliterationService;
     }
 
     public event EventHandler<XmlCreatedEventArgs> XmlCreated;
@@ -34,8 +42,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
         var directoryPath = Path.Combine(path, "YandexFeeds");
         Directory.CreateDirectory(directoryPath);
 
-        var cityManager = new JsonDataReader();
-        var jsonCities = cityManager.GetCities();
+        var jsonCities = _infoDataService.GetCities();
 
         foreach (var city in jsonCities)
         {
@@ -104,15 +111,18 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
 
             foreach (var product in cityProducts)
             {
+                var transliteratedName = _transliterationService
+                    .Transliterate(product.Model);
+
                 var offer = new Offer
                 {
                     ID = product.BitrixCode,
                     Model = product.Model,
-                    Url = $"https://mybox.ru/products/{product.Url}",
+                    Url = $"https://mybox.ru/products/{transliteratedName}",
                     Price = product.Price,
                     CurrencyId = product.Currency,
                     CategoryId = product.CategoryId,
-                    Picture = product.Picture,
+                    Picture = product.PictureLink,
                     Params = new List<Param>()
                     {
                         new Param() { Name = "Вес", Unit ="Грамм", Value = product.Weight },

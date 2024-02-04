@@ -1,25 +1,20 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ConverserLibrary.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ConverserLibrary.Services
 {
     /// <summary>
     /// Сервис для транслитерации.
     /// </summary>
-    public class TransliterationService
+    public class TransliterationService : ITransliterationService
     {
-        private Dictionary<char, string> transliterationMap;
+        private static readonly Dictionary<char, string> _transliterationMap;
 
-        private readonly ILogger<TransliterationService> _logger;
-
-        public TransliterationService()
+        static TransliterationService()
         {
-            InitializeTransliterationMap();
-        }
-
-        public void InitializeTransliterationMap()
-        {
-            transliterationMap = new Dictionary<char, string>
+            _transliterationMap = new Dictionary<char, string>
             {
                 {'а', "a"},
                 {'б', "b"},
@@ -31,7 +26,7 @@ namespace ConverserLibrary.Services
                 {'ж', "zh"},
                 {'з', "z"},
                 {'и', "i"},
-                {'й', "y"}, 
+                {'й', "y"},
                 {'к', "k"},
                 {'л', "l"},
                 {'м', "m"},
@@ -48,9 +43,9 @@ namespace ConverserLibrary.Services
                 {'ч', "ch"},
                 {'ш', "sh"},
                 {'щ', "shch"},
-                {'ъ', ""},   
-                {'ы', "y"}, 
-                {'ь', ""},  
+                {'ъ', ""},
+                {'ы', "y"},
+                {'ь', ""},
                 {'э', "e"},
                 {'ю', "yu"},
                 {'я', "ya"},
@@ -59,7 +54,22 @@ namespace ConverserLibrary.Services
                 {'-', "_"},
                 {',', "_"},
                 {'.', "_"},
+                //{'(', ""},
+                //{')', ""},
+                //{':', ""},
+                //{'+', ""},
+                //{'?', ""},
+                //{'!', ""},
+                //{'"', ""},
             };
+        }
+
+        private readonly ILogger<TransliterationService> _logger;
+
+        public TransliterationService(ILogger<TransliterationService> logger)
+        {
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -69,36 +79,25 @@ namespace ConverserLibrary.Services
         /// <returns>Транслитерированный текст на латинице в нижнем регистре.</returns>
         public string Transliterate(string text)
         {
-            if (string.IsNullOrEmpty(text))
-                _logger.LogError("Ошибка: Название блюда '{text}' отсутствует.", text);
-
             var result = new StringBuilder();
 
-            foreach (char symbol in text)
+            foreach (char symbol in text.ToLower())
             {
-                if (char.IsDigit(symbol))
+                if (char.IsDigit(symbol) || IsLatinLetter(symbol))
                 {
                     result.Append(symbol);
-                    continue;
                 }
-
-                if (IsLatinLetter(symbol))
-                {
-                    result.Append(symbol);
-                    continue;
-                }
-
-                if (transliterationMap.TryGetValue(symbol, out string value))
+                else if (_transliterationMap.TryGetValue(symbol, out string value))
                 {
                     result.Append(value);
                 }
                 else
                 {
-                    result.Append(symbol);
+                    result.Append("");
                 }
             }
 
-            return result.ToString().ToLower();
+            return Regex.Replace(result.ToString().TrimEnd('_'), @"_+", "_");
         }
 
         private bool IsLatinLetter(char symbol)

@@ -16,10 +16,9 @@ namespace ConverserLibrary
         enum Field
         {
             Model,
-            Url,
             Price,
             CategoryId,
-            Picture,
+            PictureLink,
             Weight,
             Quantity,
             Description,
@@ -52,10 +51,9 @@ namespace ConverserLibrary
                 throw new ArgumentNullException(nameof(logger));
 
             var model = new FieldData(5, "Model", (v, p) => p.Model = v);
-            var url = new FieldData(32, "Url", (v, p) => p.Url = v);
             var price = new FieldData(6, "Price", (v, p) => p.Price = GetNumericValue(v));
             var categoryId = new FieldData(26, "CategoryId", (v, p) => p.CategoryId = v);
-            var picture = new FieldData(3, "Picture", (v, p) => p.Picture = v);
+            var pictureLink = new FieldData(3, "PictureLink", (v, p) => p.PictureLink = v);
             var weight = new FieldData(13, "Weight", (v, p) => p.Weight = GetNumericValue(v));
             var bitrixCode = new FieldData(20, "BitrixCode", (v, p) => p.BitrixCode = v);
             var quantity = new FieldData(14, "Quantity", (v, p) => p.Quantity = GetNumericValue(v));
@@ -71,10 +69,9 @@ namespace ConverserLibrary
             _fields = new Dictionary<Field, FieldData>()
             {
                 { Field.Model, model },
-                { Field.Url, url },
                 { Field.Price, price },
                 { Field.CategoryId, categoryId },
-                { Field.Picture, picture },
+                { Field.PictureLink, pictureLink },
                 { Field.Weight, weight },
                 { Field.BitrixCode, bitrixCode },
                 { Field.Quantity, quantity },
