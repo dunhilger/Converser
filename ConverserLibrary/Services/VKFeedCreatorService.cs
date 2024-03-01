@@ -116,7 +116,7 @@ namespace ConverserLibrary.Services
                         Price = product.Price,
                         CurrencyId = product.Currency,
                         CategoryId = product.CategoryId,
-                        Model = product.Model,
+                        Model = product.CommercialName,
                         Description = description,
                         Picture = product.PictureLink,
                     };
@@ -135,22 +135,22 @@ namespace ConverserLibrary.Services
             var descriptionBuilder = new StringBuilder();
 
             descriptionBuilder.AppendLine(product.Description);
-            descriptionBuilder.AppendLine("<br/>");
-            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("");
+            //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine($"{product.Quantity} шт / {product.Weight} г");
-            descriptionBuilder.AppendLine("<br/>");
-            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("");
+            //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine("Цена может отличаться в зависимости от твоего города.");
-            descriptionBuilder.AppendLine("<br/>");
-            descriptionBuilder.AppendLine("<br/>");
+            descriptionBuilder.AppendLine("");
+            //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine("Точную цену можно уточнить на сайте.");
 
             var matchingUtmLabel = utmLabels.FirstOrDefault(label => label.CategoryId == product.CategoryId);
 
             if (matchingUtmLabel is not null)
             {
-                descriptionBuilder.AppendLine("<br/>");
-                descriptionBuilder.AppendLine("<br/>");
+                descriptionBuilder.AppendLine("");
+                //descriptionBuilder.AppendLine("<br/>");
                 descriptionBuilder.AppendLine(matchingUtmLabel.CategoryUTMLabel);
             }
             else

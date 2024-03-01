@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            saveFileDialog1 = new SaveFileDialog();
-            DisplayFileNameElement = new Label();
             YandexFeedButton = new Button();
             TwoGisFeedButton = new Button();
             VKFeedButton = new Button();
@@ -41,22 +39,18 @@
             SaveFileText = new Label();
             BrowseDirectoryExportField = new TextBox();
             FieldDataResetButton = new Button();
+            DataLoadButton = new Button();
+            panel1 = new Panel();
+            panel2 = new Panel();
+            panel1.SuspendLayout();
+            panel2.SuspendLayout();
             SuspendLayout();
-            // 
-            // DisplayFileNameElement
-            // 
-            DisplayFileNameElement.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            DisplayFileNameElement.Location = new Point(715, 430);
-            DisplayFileNameElement.Name = "DisplayFileNameElement";
-            DisplayFileNameElement.Size = new Size(311, 149);
-            DisplayFileNameElement.TabIndex = 1;
-            DisplayFileNameElement.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // YandexFeedButton
             // 
             YandexFeedButton.BackColor = SystemColors.GrayText;
             YandexFeedButton.BackgroundImage = Properties.Resources.original_yry2;
-            YandexFeedButton.Location = new Point(65, 216);
+            YandexFeedButton.Location = new Point(23, 242);
             YandexFeedButton.Name = "YandexFeedButton";
             YandexFeedButton.Size = new Size(264, 117);
             YandexFeedButton.TabIndex = 2;
@@ -66,7 +60,7 @@
             // TwoGisFeedButton
             // 
             TwoGisFeedButton.BackgroundImage = Properties.Resources._2_GIS_Logo_Color_3afd0055671;
-            TwoGisFeedButton.Location = new Point(65, 339);
+            TwoGisFeedButton.Location = new Point(310, 242);
             TwoGisFeedButton.Name = "TwoGisFeedButton";
             TwoGisFeedButton.Size = new Size(264, 117);
             TwoGisFeedButton.TabIndex = 3;
@@ -76,7 +70,7 @@
             // VKFeedButton
             // 
             VKFeedButton.BackgroundImage = Properties.Resources.vk_2;
-            VKFeedButton.Location = new Point(65, 462);
+            VKFeedButton.Location = new Point(600, 242);
             VKFeedButton.Name = "VKFeedButton";
             VKFeedButton.Size = new Size(264, 117);
             VKFeedButton.TabIndex = 4;
@@ -85,7 +79,7 @@
             // 
             // DirectoryImportButton
             // 
-            DirectoryImportButton.Location = new Point(703, 73);
+            DirectoryImportButton.Location = new Point(678, 49);
             DirectoryImportButton.Name = "DirectoryImportButton";
             DirectoryImportButton.Size = new Size(36, 29);
             DirectoryImportButton.TabIndex = 6;
@@ -95,7 +89,7 @@
             // 
             // DirectoryExportButton
             // 
-            DirectoryExportButton.Location = new Point(703, 158);
+            DirectoryExportButton.Location = new Point(703, 523);
             DirectoryExportButton.Name = "DirectoryExportButton";
             DirectoryExportButton.Size = new Size(36, 29);
             DirectoryExportButton.TabIndex = 7;
@@ -106,7 +100,7 @@
             // BrowseDirectoryImportField
             // 
             BrowseDirectoryImportField.AllowDrop = true;
-            BrowseDirectoryImportField.Location = new Point(65, 73);
+            BrowseDirectoryImportField.Location = new Point(33, 49);
             BrowseDirectoryImportField.Name = "BrowseDirectoryImportField";
             BrowseDirectoryImportField.PlaceholderText = "Перетащите сюда файл Excel или кликните для выбора файла на компьютере";
             BrowseDirectoryImportField.ReadOnly = true;
@@ -119,7 +113,7 @@
             // BrowseFileText
             // 
             BrowseFileText.AutoSize = true;
-            BrowseFileText.Location = new Point(66, 36);
+            BrowseFileText.Location = new Point(33, 9);
             BrowseFileText.Name = "BrowseFileText";
             BrowseFileText.Size = new Size(135, 23);
             BrowseFileText.TabIndex = 9;
@@ -128,7 +122,7 @@
             // SaveFileText
             // 
             SaveFileText.AutoSize = true;
-            SaveFileText.Location = new Point(64, 119);
+            SaveFileText.Location = new Point(33, 21);
             SaveFileText.Name = "SaveFileText";
             SaveFileText.Size = new Size(157, 23);
             SaveFileText.TabIndex = 10;
@@ -136,7 +130,7 @@
             // 
             // BrowseDirectoryExportField
             // 
-            BrowseDirectoryExportField.Location = new Point(67, 158);
+            BrowseDirectoryExportField.Location = new Point(58, 523);
             BrowseDirectoryExportField.Name = "BrowseDirectoryExportField";
             BrowseDirectoryExportField.PlaceholderText = "Укажите путь сохранения результата";
             BrowseDirectoryExportField.ReadOnly = true;
@@ -146,35 +140,73 @@
             // 
             // FieldDataResetButton
             // 
-            FieldDataResetButton.Image = Properties.Resources.icons8_кнопка_с_крестиком_48;
-            FieldDataResetButton.Location = new Point(703, 113);
+            FieldDataResetButton.BackColor = Color.White;
+            FieldDataResetButton.ForeColor = SystemColors.ButtonFace;
+            FieldDataResetButton.Image = (Image)resources.GetObject("FieldDataResetButton.Image");
+            FieldDataResetButton.Location = new Point(744, 3);
             FieldDataResetButton.Name = "FieldDataResetButton";
             FieldDataResetButton.Size = new Size(36, 34);
             FieldDataResetButton.TabIndex = 12;
-            FieldDataResetButton.UseVisualStyleBackColor = true;
+            FieldDataResetButton.UseVisualStyleBackColor = false;
             FieldDataResetButton.Click += FieldDataResetButton_Click;
+            // 
+            // DataLoadButton
+            // 
+            DataLoadButton.AutoSize = true;
+            DataLoadButton.Location = new Point(33, 96);
+            DataLoadButton.Name = "DataLoadButton";
+            DataLoadButton.Size = new Size(166, 56);
+            DataLoadButton.TabIndex = 13;
+            DataLoadButton.Text = "Загрузить данные";
+            DataLoadButton.UseVisualStyleBackColor = true;
+            DataLoadButton.Click += DataLoadButton_Click;
+            // 
+            // panel1
+            // 
+            panel1.BackColor = Color.Transparent;
+            panel1.BorderStyle = BorderStyle.Fixed3D;
+            panel1.Controls.Add(FieldDataResetButton);
+            panel1.Controls.Add(DataLoadButton);
+            panel1.Controls.Add(BrowseDirectoryImportField);
+            panel1.Controls.Add(BrowseFileText);
+            panel1.Controls.Add(DirectoryImportButton);
+            panel1.Location = new Point(23, 29);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(787, 169);
+            panel1.TabIndex = 14;
+            // 
+            // panel2
+            // 
+            panel2.BackColor = Color.Transparent;
+            panel2.BorderStyle = BorderStyle.Fixed3D;
+            panel2.Controls.Add(SaveFileText);
+            panel2.Location = new Point(23, 461);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(787, 117);
+            panel2.TabIndex = 14;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(9F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
-            ClientSize = new Size(1071, 615);
-            Controls.Add(FieldDataResetButton);
+            ClientSize = new Size(1155, 613);
             Controls.Add(BrowseDirectoryExportField);
-            Controls.Add(SaveFileText);
-            Controls.Add(BrowseFileText);
-            Controls.Add(BrowseDirectoryImportField);
             Controls.Add(DirectoryExportButton);
-            Controls.Add(DirectoryImportButton);
             Controls.Add(VKFeedButton);
             Controls.Add(TwoGisFeedButton);
             Controls.Add(YandexFeedButton);
-            Controls.Add(DisplayFileNameElement);
+            Controls.Add(panel1);
+            Controls.Add(panel2);
             Font = new Font("Segoe UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
             Text = "Converser";
+            WindowState = FormWindowState.Maximized;
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -182,8 +214,6 @@
         #endregion
 
         private Label DragDropElement;
-        private SaveFileDialog saveFileDialog1;
-        private Label DisplayFileNameElement;
         private Button YandexFeedButton;
         private Button TwoGisFeedButton;
         private Button VKFeedButton;
@@ -195,5 +225,8 @@
         private Label SaveFileText;
         private TextBox BrowseDirectoryExportField;
         private Button FieldDataResetButton;
+        private Button DataLoadButton;
+        private Panel panel1;
+        private Panel panel2;
     }
 }

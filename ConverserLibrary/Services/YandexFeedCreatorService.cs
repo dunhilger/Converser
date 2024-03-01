@@ -46,7 +46,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
 
         foreach (var city in jsonCities)
         {
-            if (!citySeparatorResult.CityProducts.ContainsKey(city.CityName))
+            if (!citySeparatorResult.CityProducts.ContainsKey(city.CityName))  // ???
             {
                 _logger.LogError("Город '{cityName}' не найден в Excel.", city.CityName);
                 continue;
@@ -62,7 +62,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
             nameSpace.Add("", "");
 
             var serializer = new XmlSerializer(typeof(Catalog));
-            var filePath = Path.Combine(directoryPath, $"{city.TransliterationCityName}.xml");
+            var filePath = Path.Combine(directoryPath, $"{_transliterationService.Transliterate(city.CityName)}.xml"); ///
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
@@ -112,13 +112,13 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
             foreach (var product in cityProducts)
             {
                 var transliteratedName = _transliterationService
-                    .Transliterate(product.Model);
+                    .Transliterate(product.TechnicalName);
 
                 var offer = new Offer
                 {
                     ID = product.BitrixCode,
-                    Model = product.Model,
-                    Url = $"https://mybox.ru/products/{transliteratedName}",
+                    Model = product.CommercialName,
+                    Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}", 
                     Price = product.Price,
                     CurrencyId = product.Currency,
                     CategoryId = product.CategoryId,

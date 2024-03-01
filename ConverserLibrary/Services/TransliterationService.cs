@@ -12,6 +12,9 @@ namespace ConverserLibrary.Services
     {
         private static readonly Dictionary<char, string> _transliterationMap;
 
+        /// <summary>
+        /// Инициализирует экземпляр класса TransliterationService.
+        /// </summary>
         static TransliterationService()
         {
             _transliterationMap = new Dictionary<char, string>
@@ -53,19 +56,17 @@ namespace ConverserLibrary.Services
                 {'/', "_"},
                 {'-', "_"},
                 {',', "_"},
-                {'.', "_"},
-                //{'(', ""},
-                //{')', ""},
-                //{':', ""},
-                //{'+', ""},
-                //{'?', ""},
-                //{'!', ""},
-                //{'"', ""},
+                {'.', "_"}
             };
         }
 
         private readonly ILogger<TransliterationService> _logger;
 
+        /// <summary>
+        /// Инициализирует экземпляр класса TransliterationService.
+        /// </summary>
+        /// <param name="logger">Интерфейс логгера.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public TransliterationService(ILogger<TransliterationService> logger)
         {
             _logger = logger ??

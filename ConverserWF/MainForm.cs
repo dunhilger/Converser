@@ -1,4 +1,5 @@
 using ConverserLibrary;
+using ConverserLibrary.Dto;
 using ConverserLibrary.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -40,6 +41,7 @@ namespace ConverserWF
             YandexFeedButton.Enabled = false;
             VKFeedButton.Enabled = false;
             TwoGisFeedButton.Enabled = false;
+            DataLoadButton.Enabled = false;
 
             _yandexFeedCreatorService.XmlCreated += OnXmlCreated;
         }
@@ -52,6 +54,8 @@ namespace ConverserWF
         private static string filePathImport;
 
         private static string filePathExport;
+
+        private static CitySeparatorResult cityDictionary;
 
         /// <summary>
         /// Обработчик события Click для кнопки YandexFeedButton.
@@ -105,6 +109,29 @@ namespace ConverserWF
         }
 
         /// <summary>
+        /// Обработчик события Click для кнопки DataLoadButton.
+        /// </summary>
+        /// <param name="sender">Объект, вызвавший событие.</param>
+        /// <param name="e">Аргументы события Click.</param>
+        private void DataLoadButton_Click(object sender, EventArgs e)
+        {
+            var products = _parser.GetXLSXFile(filePathImport);
+            cityDictionary = _separator.SeparateByCity(products);
+
+            if (cityDictionary.Categories.Count > 0)
+            {
+                DataLoadButton.Text = "Загружено успешно!";
+                DataLoadButton.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show(this, "Выбранный файл Excel не подходит для создания фидов.", "Внимание",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                FieldDataResetButton_Click(this, new EventArgs());
+            }        
+        }
+
+        /// <summary>
         /// Обработчик события DragEnter для контрола, позволяющий перетаскивать файлы.
         /// </summary>
         /// <param name="sender">Объект, вызвавший событие.</param>
@@ -140,7 +167,7 @@ namespace ConverserWF
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files.Length > 0)
             {
-                filePathImport = files[0];  
+                filePathImport = files[0];
 
                 if (string.IsNullOrEmpty(filePathExport))
                 {
@@ -172,7 +199,7 @@ namespace ConverserWF
                 {
                     filePathImport = openFileDialog.FileName;
 
-                    if (string.IsNullOrEmpty(filePathExport))
+                    if (string.IsNullOrEmpty(filePathExport) || filePathExport != filePathImport)
                     {
                         filePathExport = filePathImport;
                         BrowseDirectoryExportField.Text = Path.GetDirectoryName(filePathImport);
@@ -184,7 +211,7 @@ namespace ConverserWF
                 }
                 else
                 {
-                    BrowseDirectoryImportField.Text = !string.IsNullOrEmpty(filePathImport) ? 
+                    BrowseDirectoryImportField.Text = !string.IsNullOrEmpty(filePathImport) ?
                                                       filePathImport : "";
                 }
             }
@@ -223,6 +250,7 @@ namespace ConverserWF
                 YandexFeedButton.Enabled = true;
                 VKFeedButton.Enabled = true;
                 TwoGisFeedButton.Enabled = true;
+                DataLoadButton.Enabled = true;
             }
             else
             {
@@ -230,6 +258,7 @@ namespace ConverserWF
                 YandexFeedButton.Enabled = false;
                 VKFeedButton.Enabled = false;
                 TwoGisFeedButton.Enabled = false;
+                DataLoadButton.Enabled = false;
             }
         }
 
@@ -242,11 +271,13 @@ namespace ConverserWF
         {
             filePathExport = null;
             filePathImport = null;
-            BrowseDirectoryExportField.Text = "";
-            BrowseDirectoryImportField.Text = "";
+            BrowseDirectoryExportField.Text = string.Empty;
+            BrowseDirectoryImportField.Text = string.Empty;
             YandexFeedButton.Enabled = false;
             VKFeedButton.Enabled = false;
             TwoGisFeedButton.Enabled = false;
+            DataLoadButton.Enabled = false;
+            DataLoadButton.Text = "Загрузить данные";
         }
 
         /// <summary>

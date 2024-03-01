@@ -15,7 +15,8 @@ namespace ConverserLibrary
         /// </summary>
         enum Field
         {
-            Model,
+            CommercialName,
+            TechnicalName,
             Price,
             CategoryId,
             PictureLink,
@@ -50,25 +51,27 @@ namespace ConverserLibrary
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
 
-            var model = new FieldData(5, "Model", (v, p) => p.Model = v);
+            var commercialName = new FieldData(5, "CommercialName", (v, p) => p.CommercialName = v);
+            var technicalName = new FieldData(4, "TechnicalName", (v, p) => p.TechnicalName = v);
             var price = new FieldData(6, "Price", (v, p) => p.Price = GetNumericValue(v));
-            var categoryId = new FieldData(26, "CategoryId", (v, p) => p.CategoryId = v);
+            var categoryId = new FieldData(27, "CategoryId", (v, p) => p.CategoryId = v);
             var pictureLink = new FieldData(3, "PictureLink", (v, p) => p.PictureLink = v);
             var weight = new FieldData(13, "Weight", (v, p) => p.Weight = GetNumericValue(v));
             var bitrixCode = new FieldData(20, "BitrixCode", (v, p) => p.BitrixCode = v);
             var quantity = new FieldData(14, "Quantity", (v, p) => p.Quantity = GetNumericValue(v));
             var description = new FieldData(9, "Description", (v, p) => p.Description = v);
-            var japaneseCuisineStation = new FieldData(24, "JapaneseCuisineStation",
+            var japaneseCuisineStation = new FieldData(25, "JapaneseCuisineStation",
                 (v, p) => p.JapaneseCuisineStationQuantity = GetIntValue(v));
-            var panasianCuisineStation = new FieldData(25, "PanasianCuisineStation",
+            var panasianCuisineStation = new FieldData(26, "PanasianCuisineStation",
                 (v, p) => p.PanasianCuisineStationQuantity = GetIntValue(v));
             var categoryName = new FieldData(8, "CategoryName", (v, p) => p.CategoryName = v);
-            var parentCategoryId = new FieldData(27, "ParentCategoryId", (v, p) => p.ParentCategoryId = v);
-            var parentCategoryName = new FieldData(28, "ParentCategoryName", (v, p) => p.ParentCategoryName = v);
+            var parentCategoryId = new FieldData(28, "ParentCategoryId", (v, p) => p.ParentCategoryId = v);
+            var parentCategoryName = new FieldData(29, "ParentCategoryName", (v, p) => p.ParentCategoryName = v);
 
             _fields = new Dictionary<Field, FieldData>()
             {
-                { Field.Model, model },
+                { Field.CommercialName, commercialName },
+                { Field.TechnicalName, technicalName },
                 { Field.Price, price },
                 { Field.CategoryId, categoryId },
                 { Field.PictureLink, pictureLink },

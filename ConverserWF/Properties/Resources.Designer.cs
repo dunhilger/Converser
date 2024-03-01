@@ -93,6 +93,36 @@ namespace ConverserWF.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap free_icon_switch_arrows_9497023 {
+            get {
+                object obj = ResourceManager.GetObject("free-icon-switch-arrows-9497023", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap free_icon_switch_arrows_9497023__1_ {
+            get {
+                object obj = ResourceManager.GetObject("free-icon-switch-arrows-9497023 (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap free_icon_switch_arrows_9497023__1_1 {
+            get {
+                object obj = ResourceManager.GetObject("free-icon-switch-arrows-9497023 (1)1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icons8_кнопка_с_крестиком_48 {
             get {
                 object obj = ResourceManager.GetObject("icons8-кнопка-с-крестиком-48", resourceCulture);
@@ -126,6 +156,16 @@ namespace ConverserWF.Properties {
         internal static System.Drawing.Bitmap original_yry2 {
             get {
                 object obj = ResourceManager.GetObject("original-yry2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap picture {
+            get {
+                object obj = ResourceManager.GetObject("picture", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

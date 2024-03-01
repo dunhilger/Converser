@@ -31,9 +31,14 @@
         public string Vendor { get; } = "MYBOX";
 
         /// <summary>
-        /// Получает название товара.
+        /// Получает коммерческое название товара.
         /// </summary>
-        public string Model { get; set; }
+        public string CommercialName { get; set; }
+
+        /// <summary>
+        /// Получает техническое название товара.
+        /// </summary>
+        public string TechnicalName { get; set; }         
 
         /// <summary>
         /// Получает цену товара.
