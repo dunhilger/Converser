@@ -24,5 +24,14 @@ namespace ConverserLibrary.Models
         /// </summary>
         [XmlText]
         public string Value { get; set; }
+
+        /// <summary>
+        /// Переопределяет ToString для вывода данных о категории в заданном формате
+        /// </summary>
+        /// <returns>Строку с названием и ID категории</returns>
+        public override string ToString()
+        {
+            return $"{Value} [{ID}]";
+        }
     }
 }

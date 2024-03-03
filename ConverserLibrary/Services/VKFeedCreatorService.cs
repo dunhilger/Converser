@@ -135,13 +135,13 @@ namespace ConverserLibrary.Services
             var descriptionBuilder = new StringBuilder();
 
             descriptionBuilder.AppendLine(product.Description);
-            descriptionBuilder.AppendLine("");
+            //descriptionBuilder.AppendLine("");
             //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine($"{product.Quantity} шт / {product.Weight} г");
-            descriptionBuilder.AppendLine("");
+            //descriptionBuilder.AppendLine("");
             //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine("Цена может отличаться в зависимости от твоего города.");
-            descriptionBuilder.AppendLine("");
+            //descriptionBuilder.AppendLine("");
             //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine("Точную цену можно уточнить на сайте.");
 
@@ -149,7 +149,7 @@ namespace ConverserLibrary.Services
 
             if (matchingUtmLabel is not null)
             {
-                descriptionBuilder.AppendLine("");
+                //descriptionBuilder.AppendLine("");
                 //descriptionBuilder.AppendLine("<br/>");
                 descriptionBuilder.AppendLine(matchingUtmLabel.CategoryUTMLabel);
             }

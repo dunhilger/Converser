@@ -46,7 +46,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
 
         foreach (var city in jsonCities)
         {
-            if (!citySeparatorResult.CityProducts.ContainsKey(city.CityName))  // ???
+            if (!citySeparatorResult.CityProducts.ContainsKey(city.CityName))  
             {
                 _logger.LogError("Город '{cityName}' не найден в Excel.", city.CityName);
                 continue;
@@ -111,8 +111,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
 
             foreach (var product in cityProducts)
             {
-                var transliteratedName = _transliterationService
-                    .Transliterate(product.TechnicalName);
+                var transliteratedName = _transliterationService.Transliterate(product.TechnicalName);
 
                 var offer = new Offer
                 {

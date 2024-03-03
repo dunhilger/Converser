@@ -1,6 +1,7 @@
-using ConverserLibrary;
+п»їusing ConverserLibrary;
 using ConverserLibrary.Dto;
 using ConverserLibrary.Interfaces;
+using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ConverserWF
@@ -16,13 +17,13 @@ namespace ConverserWF
         // private readonly IInformationService _information;
 
         /// <summary>
-        /// Инициализирует экземпляр класса MainService.
+        /// РРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ СЌРєР·РµРјРїР»СЏСЂ РєР»Р°СЃСЃР° MainService.
         /// </summary>
-        /// <param name="logger">Интерфейс логгера</param>
-        /// <param name="parser">Интерфейс сервиса парсера</param>
-        /// <param name="separator">Интерфейс сервиса сепаратора</param>
-        /// <param name="yandexFeedCreatorService">Интерфейс сервиса для создания XML-фидов Яндекс</param>
-        /// <param name="twoGisFeedCreatorService">Интерфейс сервиса для создания XML-фидов 2ГИС</param>
+        /// <param name="logger">РРЅС‚РµСЂС„РµР№СЃ Р»РѕРіРіРµСЂР°</param>
+        /// <param name="parser">РРЅС‚РµСЂС„РµР№СЃ СЃРµСЂРІРёСЃР° РїР°СЂСЃРµСЂР°</param>
+        /// <param name="separator">РРЅС‚РµСЂС„РµР№СЃ СЃРµСЂРІРёСЃР° СЃРµРїР°СЂР°С‚РѕСЂР°</param>
+        /// <param name="yandexFeedCreatorService">РРЅС‚РµСЂС„РµР№СЃ СЃРµСЂРІРёСЃР° РґР»СЏ СЃРѕР·РґР°РЅРёСЏ XML-С„РёРґРѕРІ РЇРЅРґРµРєСЃ</param>
+        /// <param name="twoGisFeedCreatorService">РРЅС‚РµСЂС„РµР№СЃ СЃРµСЂРІРёСЃР° РґР»СЏ СЃРѕР·РґР°РЅРёСЏ XML-С„РёРґРѕРІ 2Р“РРЎ</param>
         public MainForm(ILogger<MainForm> logger,
             IExcelParserService parser,
             ICitySeparatorService separator,
@@ -42,109 +43,144 @@ namespace ConverserWF
             VKFeedButton.Enabled = false;
             TwoGisFeedButton.Enabled = false;
             DataLoadButton.Enabled = false;
-
-            _yandexFeedCreatorService.XmlCreated += OnXmlCreated;
+            CheckAll.Enabled = false;
         }
 
         private void OnXmlCreated(object sender, XmlCreatedEventArgs e)
         {
-            //SendInformation($"Создан файл {e.FileName}.");
+            //SendInformation($"РЎРѕР·РґР°РЅ С„Р°Р№Р» {e.FileName}.");
         }
 
-        private static string filePathImport;
+        private static string _filePathImport;
 
-        private static string filePathExport;
+        private static string _filePathExport;
 
-        private static CitySeparatorResult cityDictionary;
+        private static CitySeparatorResult _cityDictionary;
 
         /// <summary>
-        /// Обработчик события Click для кнопки YandexFeedButton.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ Click РґР»СЏ РєРЅРѕРїРєРё YandexFeedButton.
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ Click.</param>
         private void YandexFeedButton_Click(object sender, EventArgs e)
         {
             HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml);
         }
 
         /// <summary>
-        /// Обработчик события Click для кнопки VKFeedButton.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ Click РґР»СЏ РєРЅРѕРїРєРё VKFeedButton.
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ Click.</param>
         private void VKFeedButton_Click(object sender, EventArgs e)
         {
             HandleFeedButtonClick(_vkFeedCreatorService.CreateXml);
         }
 
         /// <summary>
-        /// Обработчик события Click для кнопки TwoGisFeedButton.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ Click РґР»СЏ РєРЅРѕРїРєРё TwoGisFeedButton.
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ Click.</param>
         private void TwoGisFeedButton_Click(object sender, EventArgs e)
         {
             HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml);
         }
 
         /// <summary>
-        /// Обработчик для кнопок генерации фидов. Принимает делегат, соответствующий
-        /// сигнатуре метода CreateXml.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє РґР»СЏ РєРЅРѕРїРѕРє РіРµРЅРµСЂР°С†РёРё С„РёРґРѕРІ. РџСЂРёРЅРёРјР°РµС‚ РґРµР»РµРіР°С‚, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№
+        /// СЃРёРіРЅР°С‚СѓСЂРµ РјРµС‚РѕРґР° CreateXml.
         /// </summary>
-        /// <param name="createXml">Метод создания XML-файлов</param>
+        /// <param name="createXml">РњРµС‚РѕРґ СЃРѕР·РґР°РЅРёСЏ XML-С„Р°Р№Р»РѕРІ</param>
         private void HandleFeedButtonClick(Action<string, CitySeparatorResult> createXml)
         {
-            _logger.LogInformation($"Старт обработки. Файл: {filePathImport}");
+            _logger.LogInformation($"РЎС‚Р°СЂС‚ РѕР±СЂР°Р±РѕС‚РєРё. Р¤Р°Р№Р»: {_filePathImport}");
 
-            // парсинг эксель, получение списка всех товаров  
-            var products = _parser.GetXLSXFile(filePathImport);
+            _cityDictionary.Categories.Clear();
 
-            // разбивка списка по городам
-            var cityDictionary = _separator.SeparateByCity(products);
+            foreach (Category category in CategoriesListCheckBox.CheckedItems)
+            {
+                _cityDictionary.Categories.Add(category);// РІ СЃРїРёСЃРєРµ РєР°С‚РµРіРѕСЂРёР№ С„РёРґРѕРІ РѕСЃС‚Р°СЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РІС‹Р±СЂР°РЅРЅС‹Рµ РєР°С‚РµРіРѕСЂРёРё
+            }
 
-            // создание фидов
-            createXml(Path.GetDirectoryName(filePathExport), cityDictionary);
+            createXml(Path.GetDirectoryName(_filePathExport), _cityDictionary);
 
-            _logger.LogInformation("Генерация XML-файлов завершена.");
+            _logger.LogInformation("Р“РµРЅРµСЂР°С†РёСЏ XML-С„Р°Р№Р»РѕРІ Р·Р°РІРµСЂС€РµРЅР°.");
         }
 
         /// <summary>
-        /// Обработчик события Click для кнопки DataLoadButton.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ Click РґР»СЏ РєРЅРѕРїРєРё DataLoadButton.
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ Click.</param>
         private void DataLoadButton_Click(object sender, EventArgs e)
         {
-            var products = _parser.GetXLSXFile(filePathImport);
-            cityDictionary = _separator.SeparateByCity(products);
+            CategoriesListCheckBox.Items.Clear();
+            CheckAll.Enabled = true;
+            CheckAll.Checked = false;
 
-            if (cityDictionary.Categories.Count > 0)
+            var products = _parser.GetXLSXFile(_filePathImport);
+            _cityDictionary = _separator.SeparateByCity(products);
+
+            if (_cityDictionary.Categories.Count > 0 && 
+                _cityDictionary.CityProducts.Count > 0 &&
+                _cityDictionary.CityProducts.Keys.Count > 0)
             {
-                DataLoadButton.Text = "Загружено успешно!";
+                DataLoadButton.Text = "Р—Р°РіСЂСѓР¶РµРЅРѕ СѓСЃРїРµС€РЅРѕ!";
                 DataLoadButton.Enabled = false;
+                YandexFeedButton.Enabled = true;
+                VKFeedButton.Enabled = true;
+                TwoGisFeedButton.Enabled = true;
+
+                foreach (var category in _cityDictionary.Categories)
+                {
+                    CategoriesListCheckBox.Items.Add(new Category
+                    {
+                        ID = category.ID,
+                        Value = category.Value,
+                        ParentID = category.ParentID
+                    });
+                }
             }
             else
             {
-                MessageBox.Show(this, "Выбранный файл Excel не подходит для создания фидов.", "Внимание",
+                MessageBox.Show(this, "Р’С‹Р±СЂР°РЅРЅС‹Р№ С„Р°Р№Р» Excel РЅРµ РїРѕРґС…РѕРґРёС‚ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ С„РёРґРѕРІ.", "Р’РЅРёРјР°РЅРёРµ",
                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 FieldDataResetButton_Click(this, new EventArgs());
-            }        
+            }
         }
 
         /// <summary>
-        /// Обработчик события DragEnter для контрола, позволяющий перетаскивать файлы.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ CheckAll_Click. РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚/СЃРЅРёРјР°РµС‚ РІСЃРµ РіР°Р»РѕС‡РєРё
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события DragEnter.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ DragEnter.</param>
+        private void CheckAll_Click(object sender, EventArgs e)
+        {
+            CategoriesListCheckBox.SetItemChecked(0, !CategoriesListCheckBox.GetItemChecked(0));
+
+            bool selectAll = CategoriesListCheckBox.GetItemChecked(0);
+
+            for (int i = 1; i < CategoriesListCheckBox.Items.Count; i++)
+            {
+                CategoriesListCheckBox.SetItemChecked(i, selectAll);
+            }
+        }///СѓСЃС‚Р°РЅРѕРІРєР° РіР°Р»РѕС‡РµРє СЃ РєР»Р°РІРёР°С‚СѓСЂС‹ - СѓР±СЂР°С‚СЊ
+
+        /// <summary>
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ DragEnter РґР»СЏ РєРѕРЅС‚СЂРѕР»Р°, РїРѕР·РІРѕР»СЏСЋС‰РёР№ РїРµСЂРµС‚Р°СЃРєРёРІР°С‚СЊ С„Р°Р№Р»С‹.
+        /// </summary>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ DragEnter.</param>
         private void OnDragEnter(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
             if (files.Length > 0)
             {
-                filePathImport = files[0];
+                _filePathImport = files[0];
 
-                if (IsExcelFile(filePathImport))
+                if (IsExcelFile(_filePathImport))
                 {
                     e.Effect = DragDropEffects.Copy;
                     Cursor = Cursors.Default;
@@ -158,70 +194,78 @@ namespace ConverserWF
         }
 
         /// <summary>
-        /// Обработчик события DragDrop для контрола, выполняющийся при перетаскивании файла в область контрола.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ DragDrop РґР»СЏ РєРѕРЅС‚СЂРѕР»Р°, РІС‹РїРѕР»РЅСЏСЋС‰РёР№СЃСЏ РїСЂРё РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРё С„Р°Р№Р»Р° РІ РѕР±Р»Р°СЃС‚СЊ РєРѕРЅС‚СЂРѕР»Р°.
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события DragDrop.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ DragDrop.</param>
         private void OnDragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files.Length > 0)
             {
-                filePathImport = files[0];
+                _filePathImport = files[0];
 
-                if (string.IsNullOrEmpty(filePathExport))
+                if (string.IsNullOrEmpty(_filePathExport))
                 {
-                    filePathExport = filePathImport;
-                    BrowseDirectoryExportField.Text = Path.GetDirectoryName(filePathImport);
+                    _filePathExport = _filePathImport;
+                    BrowseDirectoryExportField.Text = Path.GetDirectoryName(_filePathImport);
                 }
 
-                ProcessFile(filePathImport);
+                ProcessFile(_filePathImport);
 
-                BrowseDirectoryImportField.Text = filePathImport;
+                BrowseDirectoryImportField.Text = _filePathImport;
             }
         }
 
         /// <summary>
-        /// Обработчик события Click для контрола, выполняющийся при клике на элемент BrowseFileImportDirectory.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ Click РґР»СЏ РєРѕРЅС‚СЂРѕР»Р°, РІС‹РїРѕР»РЅСЏСЋС‰РёР№СЃСЏ РїСЂРё РєР»РёРєРµ РЅР° СЌР»РµРјРµРЅС‚ BrowseFileImportDirectory.
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ Click.</param>
         private void BrowseFileImportDirectory_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Файлы Excel (*.xlsx;*.xls)|*.xlsx;*.xls|Все файлы (*.*)|*.*";
-                openFileDialog.Title = "Выберите файл Excel";
+                openFileDialog.Filter = "Р¤Р°Р№Р»С‹ Excel (*.xlsx;*.xls)|*.xlsx;*.xls|Р’СЃРµ С„Р°Р№Р»С‹ (*.*)|*.*";
+                openFileDialog.Title = "Р’С‹Р±РµСЂРёС‚Рµ С„Р°Р№Р» Excel";
 
                 DialogResult dialogResult = openFileDialog.ShowDialog();
 
                 if (dialogResult == DialogResult.OK)
                 {
-                    filePathImport = openFileDialog.FileName;
+                    _filePathImport = openFileDialog.FileName;
+                    // С‡Р°СЃС‚РёС‡РЅРѕ РґСѓР±Р»РёСЂСѓРµС‚ FieldDataResetButton_Click в†’
+                    DataLoadButton.Text = "Р—Р°РіСЂСѓР·РёС‚СЊ РґР°РЅРЅС‹Рµ";
+                    CheckAll.Checked = false;
+                    CheckAll.Enabled = false;
+                    CategoriesListCheckBox.Items.Clear();
+                    YandexFeedButton.Enabled = false;
+                    VKFeedButton.Enabled = false;
+                    TwoGisFeedButton.Enabled = false;
 
-                    if (string.IsNullOrEmpty(filePathExport) || filePathExport != filePathImport)
+                    if (string.IsNullOrEmpty(_filePathExport) || _filePathExport != _filePathImport)
                     {
-                        filePathExport = filePathImport;
-                        BrowseDirectoryExportField.Text = Path.GetDirectoryName(filePathImport);
+                        _filePathExport = _filePathImport;
+                        BrowseDirectoryExportField.Text = Path.GetDirectoryName(_filePathImport);
                     }
 
-                    ProcessFile(filePathImport);
+                    ProcessFile(_filePathImport);
 
-                    BrowseDirectoryImportField.Text = filePathImport;
+                    BrowseDirectoryImportField.Text = _filePathImport;
                 }
                 else
                 {
-                    BrowseDirectoryImportField.Text = !string.IsNullOrEmpty(filePathImport) ?
-                                                      filePathImport : "";
+                    BrowseDirectoryImportField.Text = !string.IsNullOrEmpty(_filePathImport) ?
+                                                      _filePathImport : "";
                 }
             }
         }
 
         /// <summary>
-        /// Обработчик события Click для контрола, выполняющийся при клике на элемент BrowseExportDirectory.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ Click РґР»СЏ РєРѕРЅС‚СЂРѕР»Р°, РІС‹РїРѕР»РЅСЏСЋС‰РёР№СЃСЏ РїСЂРё РєР»РёРєРµ РЅР° СЌР»РµРјРµРЅС‚ BrowseExportDirectory.
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
+        /// <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ Click.</param>
         private void BrowseExportDirectory_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
@@ -235,26 +279,23 @@ namespace ConverserWF
                     BrowseDirectoryExportField.Text = folderBrowserDialog.SelectedPath;
                 }
 
-                filePathExport = folderBrowserDialog.SelectedPath;
+                _filePathExport = folderBrowserDialog.SelectedPath;
             }
         }
 
         /// <summary>
-        /// Обработка выбранного файла.
+        /// РћР±СЂР°Р±РѕС‚РєР° РІС‹Р±СЂР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°.
         /// </summary>
-        /// <param name="selectedFile">Путь к выбранному файлу.</param>
+        /// <param name="selectedFile">РџСѓС‚СЊ Рє РІС‹Р±СЂР°РЅРЅРѕРјСѓ С„Р°Р№Р»Сѓ.</param>
         private void ProcessFile(string selectedFile)
         {
             if (IsExcelFile(selectedFile))
             {
-                YandexFeedButton.Enabled = true;
-                VKFeedButton.Enabled = true;
-                TwoGisFeedButton.Enabled = true;
                 DataLoadButton.Enabled = true;
             }
             else
             {
-                MessageBox.Show($"Выбранный файл не является файлом Excel:\n{selectedFile}");
+                MessageBox.Show($"Р’С‹Р±СЂР°РЅРЅС‹Р№ С„Р°Р№Р» РЅРµ СЏРІР»СЏРµС‚СЃСЏ С„Р°Р№Р»РѕРј Excel:\n{selectedFile}");
                 YandexFeedButton.Enabled = false;
                 VKFeedButton.Enabled = false;
                 TwoGisFeedButton.Enabled = false;
@@ -263,28 +304,31 @@ namespace ConverserWF
         }
 
         /// <summary>
-        /// Обработчик события Click для контрола сброса данных в диалоговых окнах.
+        /// РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ Click РґР»СЏ РєРѕРЅС‚СЂРѕР»Р° СЃР±СЂРѕСЃР° РґР°РЅРЅС‹С… РІ РґРёР°Р»РѕРіРѕРІС‹С… РѕРєРЅР°С….
         /// </summary>
-        // <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
+        // <param name="sender">РћР±СЉРµРєС‚, РІС‹Р·РІР°РІС€РёР№ СЃРѕР±С‹С‚РёРµ.</param>
+        /// <param name="e">РђСЂРіСѓРјРµРЅС‚С‹ СЃРѕР±С‹С‚РёСЏ Click.</param>
         public void FieldDataResetButton_Click(object sender, EventArgs e)
         {
-            filePathExport = null;
-            filePathImport = null;
+            _filePathExport = null;
+            _filePathImport = null;
             BrowseDirectoryExportField.Text = string.Empty;
             BrowseDirectoryImportField.Text = string.Empty;
             YandexFeedButton.Enabled = false;
             VKFeedButton.Enabled = false;
             TwoGisFeedButton.Enabled = false;
             DataLoadButton.Enabled = false;
-            DataLoadButton.Text = "Загрузить данные";
+            DataLoadButton.Text = "Р—Р°РіСЂСѓР·РёС‚СЊ РґР°РЅРЅС‹Рµ";
+            CategoriesListCheckBox.Items.Clear();
+            CheckAll.Enabled = false;
+            CheckAll.Checked = false;
         }
 
         /// <summary>
-        /// Проверка валидности файла Excel.
+        /// РџСЂРѕРІРµСЂРєР° РІР°Р»РёРґРЅРѕСЃС‚Рё С„Р°Р№Р»Р° Excel.
         /// </summary>
-        /// <param name="filePath">Путь к файлу Excel.</param>
-        /// <returns>True, если файл является файлом Excel; в противном случае - false.</returns>
+        /// <param name="filePath">РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ Excel.</param>
+        /// <returns>True, РµСЃР»Рё С„Р°Р№Р» СЏРІР»СЏРµС‚СЃСЏ С„Р°Р№Р»РѕРј Excel; РІ РїСЂРѕС‚РёРІРЅРѕРј СЃР»СѓС‡Р°Рµ - false.</returns>
         private bool IsExcelFile(string filePath)
         {
             return Path.GetExtension(filePath).Equals(".xlsx", StringComparison.OrdinalIgnoreCase)

@@ -104,13 +104,13 @@ namespace ConverserLibrary.Services
 
                 foreach (var product in cityProducts)
                 {
-                    var transliteratedName = _transliterationService.Transliterate(product.CommercialName);
+                    var transliteratedName = _transliterationService.Transliterate(product.TechnicalName);
 
                     var offer = new Offer
                     {
                         ID = product.BitrixCode,
                         Model = product.CommercialName,
-                        Url = $"https://mybox.ru/products/{transliteratedName}/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
+                        Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
                         Price = product.Price,
                         CurrencyId = product.Currency,
                         CategoryId = product.CategoryId,
