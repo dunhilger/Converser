@@ -8,6 +8,12 @@ namespace ConverserLibrary
     /// </summary>
     public class CitySeparatorResult
     {
+        public CitySeparatorResult()
+        {
+            CityProducts = new Dictionary<string, List<Product>>();
+            Categories = new List<Category>();
+        }
+
         /// <summary>
         /// Получает словарь, где ключи - имена городов, значения - списки товаров для каждого города.
         /// </summary>

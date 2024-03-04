@@ -98,12 +98,35 @@ namespace ConverserWF
 
             _cityDictionary.Categories.Clear();
 
+            var citySeparatorResult = new CitySeparatorResult();
+
             foreach (Category category in CategoriesListCheckBox.CheckedItems)
             {
-                _cityDictionary.Categories.Add(category);// в списке категорий фидов остаются только выбранные категории
+                feedCreatorProgressBar.Maximum = CategoriesListCheckBox.CheckedItems.Count;
+                feedCreatorProgressBar.Visible = true;
+
+                foreach (var city in _cityDictionary.CityProducts.Keys)
+                {
+                    foreach (var product in _cityDictionary.CityProducts[city])
+                    {
+                        if (product.CategoryId == category.ID)
+                        {
+                            if (!citySeparatorResult.CityProducts.TryGetValue(city, out List<Product> value))
+                            {
+                                value = new List<Product>();
+                                citySeparatorResult.CityProducts[city] = value;
+                            }
+
+                            value.Add(product);
+                        }
+                    }
+                }
+
+                feedCreatorProgressBar.Value++;
+                citySeparatorResult.Categories.Add(category);// в списке категорий фидов остаются только выбранные категории               
             }
 
-            createXml(Path.GetDirectoryName(_filePathExport), _cityDictionary);
+            createXml(Path.GetDirectoryName(_filePathExport), citySeparatorResult);
 
             _logger.LogInformation("Генерация XML-файлов завершена.");
         }
@@ -118,20 +141,16 @@ namespace ConverserWF
             CategoriesListCheckBox.Items.Clear();
             CheckAll.Enabled = true;
             CheckAll.Checked = false;
-
+            
             var products = _parser.GetXLSXFile(_filePathImport);
             _cityDictionary = _separator.SeparateByCity(products);
+
+            dataLoadProgressBar.Maximum = _cityDictionary.Categories.Count;
 
             if (_cityDictionary.Categories.Count > 0 && 
                 _cityDictionary.CityProducts.Count > 0 &&
                 _cityDictionary.CityProducts.Keys.Count > 0)
             {
-                DataLoadButton.Text = "Загружено успешно!";
-                DataLoadButton.Enabled = false;
-                YandexFeedButton.Enabled = true;
-                VKFeedButton.Enabled = true;
-                TwoGisFeedButton.Enabled = true;
-
                 foreach (var category in _cityDictionary.Categories)
                 {
                     CategoriesListCheckBox.Items.Add(new Category
@@ -140,7 +159,16 @@ namespace ConverserWF
                         Value = category.Value,
                         ParentID = category.ParentID
                     });
+
+                    dataLoadProgressBar.Value++;
                 }
+
+                DataLoadButton.Text = "Загружено успешно!";
+                DataLoadButton.Enabled = false;
+                YandexFeedButton.Enabled = true;
+                VKFeedButton.Enabled = true;
+                TwoGisFeedButton.Enabled = true;
+                dataLoadProgressBar.Visible = true;
             }
             else
             {
@@ -242,6 +270,8 @@ namespace ConverserWF
                     YandexFeedButton.Enabled = false;
                     VKFeedButton.Enabled = false;
                     TwoGisFeedButton.Enabled = false;
+                    dataLoadProgressBar.Visible = false;
+                    dataLoadProgressBar.Value = 0;
 
                     if (string.IsNullOrEmpty(_filePathExport) || _filePathExport != _filePathImport)
                     {
@@ -322,6 +352,8 @@ namespace ConverserWF
             CategoriesListCheckBox.Items.Clear();
             CheckAll.Enabled = false;
             CheckAll.Checked = false;
+            dataLoadProgressBar.Visible = false;
+            dataLoadProgressBar.Value = 0;
         }
 
         /// <summary>

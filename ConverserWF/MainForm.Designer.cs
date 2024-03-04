@@ -41,12 +41,14 @@
             FieldDataResetButton = new Button();
             DataLoadButton = new Button();
             panel1 = new Panel();
+            dataLoadProgressBar = new ProgressBar();
             panel2 = new Panel();
             panel3 = new Panel();
             CheckAll = new CheckBox();
             CategoriesListCheckBox = new CheckedListBox();
             CategoryListText = new Label();
             label1 = new Label();
+            feedCreatorProgressBar = new ProgressBar();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
@@ -76,7 +78,7 @@
             // VKFeedButton
             // 
             VKFeedButton.BackgroundImage = Properties.Resources.vk_2;
-            VKFeedButton.Location = new Point(553, 621);
+            VKFeedButton.Location = new Point(555, 621);
             VKFeedButton.Name = "VKFeedButton";
             VKFeedButton.Size = new Size(257, 117);
             VKFeedButton.TabIndex = 4;
@@ -158,8 +160,9 @@
             // 
             // DataLoadButton
             // 
+            DataLoadButton.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             DataLoadButton.AutoSize = true;
-            DataLoadButton.Location = new Point(33, 96);
+            DataLoadButton.Location = new Point(33, 92);
             DataLoadButton.Name = "DataLoadButton";
             DataLoadButton.Size = new Size(166, 56);
             DataLoadButton.TabIndex = 13;
@@ -171,6 +174,7 @@
             // 
             panel1.BackColor = Color.Transparent;
             panel1.BorderStyle = BorderStyle.Fixed3D;
+            panel1.Controls.Add(dataLoadProgressBar);
             panel1.Controls.Add(FieldDataResetButton);
             panel1.Controls.Add(DataLoadButton);
             panel1.Controls.Add(BrowseDirectoryImportField);
@@ -181,6 +185,17 @@
             panel1.Size = new Size(1100, 169);
             panel1.TabIndex = 14;
             // 
+            // dataLoadProgressBar
+            // 
+            dataLoadProgressBar.Location = new Point(33, 148);
+            dataLoadProgressBar.Name = "dataLoadProgressBar";
+            dataLoadProgressBar.RightToLeft = RightToLeft.No;
+            dataLoadProgressBar.Size = new Size(184, 5);
+            dataLoadProgressBar.Step = 1;
+            dataLoadProgressBar.Style = ProgressBarStyle.Continuous;
+            dataLoadProgressBar.TabIndex = 14;
+            dataLoadProgressBar.Visible = false;
+            // 
             // panel2
             // 
             panel2.BackColor = Color.Transparent;
@@ -188,9 +203,9 @@
             panel2.Controls.Add(DirectoryExportButton);
             panel2.Controls.Add(BrowseDirectoryExportField);
             panel2.Controls.Add(SaveFileText);
-            panel2.Location = new Point(25, 758);
+            panel2.Location = new Point(23, 785);
             panel2.Name = "panel2";
-            panel2.Size = new Size(787, 117);
+            panel2.Size = new Size(789, 117);
             panel2.TabIndex = 14;
             // 
             // panel3
@@ -225,7 +240,7 @@
             CategoriesListCheckBox.Cursor = Cursors.Hand;
             CategoriesListCheckBox.FormattingEnabled = true;
             CategoriesListCheckBox.ImeMode = ImeMode.NoControl;
-            CategoriesListCheckBox.Location = new Point(37, 40);
+            CategoriesListCheckBox.Location = new Point(33, 41);
             CategoriesListCheckBox.MultiColumn = true;
             CategoriesListCheckBox.Name = "CategoriesListCheckBox";
             CategoriesListCheckBox.Size = new Size(1023, 304);
@@ -249,12 +264,21 @@
             label1.Size = new Size(100, 23);
             label1.TabIndex = 0;
             // 
+            // feedCreatorProgressBar
+            // 
+            feedCreatorProgressBar.Location = new Point(23, 754);
+            feedCreatorProgressBar.Name = "feedCreatorProgressBar";
+            feedCreatorProgressBar.Size = new Size(789, 17);
+            feedCreatorProgressBar.TabIndex = 16;
+            feedCreatorProgressBar.Visible = false;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(9F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
-            ClientSize = new Size(1148, 895);
+            ClientSize = new Size(1148, 923);
+            Controls.Add(feedCreatorProgressBar);
             Controls.Add(panel3);
             Controls.Add(VKFeedButton);
             Controls.Add(TwoGisFeedButton);
@@ -296,5 +320,7 @@
         private Label CategoryListText;
         private CheckedListBox CategoriesListCheckBox;
         private CheckBox CheckAll;
+        private ProgressBar dataLoadProgressBar;
+        private ProgressBar feedCreatorProgressBar;
     }
 }

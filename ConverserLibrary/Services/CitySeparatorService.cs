@@ -39,8 +39,6 @@ namespace ConverserLibrary
 
             List<City> allExistCities = _infoDataService.GetCities();
 
-            var excludedCategoryIds = new List<string> { "90", "35", "38" }; // набор костылей
-
             foreach (var product in products)
             {
                 if (!string.IsNullOrEmpty(product.CityName)) 
@@ -54,10 +52,7 @@ namespace ConverserLibrary
                             cityDictionary[cityName] = new List<Product>();
                         }
 
-                        if (!excludedCategoryIds.Contains(product.CategoryId)) // условия костыля
-                        {
-                            cityDictionary[cityName].Add(product);
-                        }
+                        cityDictionary[cityName].Add(product);
 
                         AddIfNotExists(categoryDictionary,
                             product.CategoryId, product.CategoryName, product.ParentCategoryId);
@@ -76,10 +71,9 @@ namespace ConverserLibrary
             { 
                 CityProducts = cityDictionary,
                 Categories = categoryDictionary.Values
-                    .Where(category => !excludedCategoryIds.Contains(category.ID)) // костыль в действии
                     .OrderBy(i => i.ParentID ?? i.ID)
                     .ThenBy(i => i.ID)
-                    .ToList(), // пользовательский выбор категорий для фидов
+                    .ToList(), 
             };
         }
 

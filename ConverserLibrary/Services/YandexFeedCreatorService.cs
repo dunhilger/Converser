@@ -62,7 +62,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
             nameSpace.Add("", "");
 
             var serializer = new XmlSerializer(typeof(Catalog));
-            var filePath = Path.Combine(directoryPath, $"{_transliterationService.Transliterate(city.CityName)}.xml"); ///
+            var filePath = Path.Combine(directoryPath, $"{_transliterationService.Transliterate(city.CityName)}.xml"); 
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
