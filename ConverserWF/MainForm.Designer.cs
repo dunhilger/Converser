@@ -41,14 +41,15 @@
             FieldDataResetButton = new Button();
             DataLoadButton = new Button();
             panel1 = new Panel();
-            dataLoadProgressBar = new ProgressBar();
+            FileSizeLabel = new Label();
+            DataLoadProgressBar = new ProgressBar();
             panel2 = new Panel();
             panel3 = new Panel();
+            CategoryTree = new TreeView();
             CheckAll = new CheckBox();
-            CategoriesListCheckBox = new CheckedListBox();
             CategoryListText = new Label();
             label1 = new Label();
-            feedCreatorProgressBar = new ProgressBar();
+            FeedCreatorProgressBar = new ProgressBar();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
@@ -58,7 +59,7 @@
             // 
             YandexFeedButton.BackColor = SystemColors.GrayText;
             YandexFeedButton.BackgroundImage = Properties.Resources.original_yry2;
-            YandexFeedButton.Location = new Point(23, 621);
+            YandexFeedButton.Location = new Point(1004, 224);
             YandexFeedButton.Name = "YandexFeedButton";
             YandexFeedButton.Size = new Size(238, 117);
             YandexFeedButton.TabIndex = 2;
@@ -68,7 +69,7 @@
             // TwoGisFeedButton
             // 
             TwoGisFeedButton.BackgroundImage = Properties.Resources._2_GIS_Logo_Color_3afd0055671;
-            TwoGisFeedButton.Location = new Point(284, 621);
+            TwoGisFeedButton.Location = new Point(1273, 224);
             TwoGisFeedButton.Name = "TwoGisFeedButton";
             TwoGisFeedButton.Size = new Size(246, 117);
             TwoGisFeedButton.TabIndex = 3;
@@ -78,7 +79,7 @@
             // VKFeedButton
             // 
             VKFeedButton.BackgroundImage = Properties.Resources.vk_2;
-            VKFeedButton.Location = new Point(555, 621);
+            VKFeedButton.Location = new Point(1554, 222);
             VKFeedButton.Name = "VKFeedButton";
             VKFeedButton.Size = new Size(257, 117);
             VKFeedButton.TabIndex = 4;
@@ -151,12 +152,12 @@
             FieldDataResetButton.BackColor = Color.LightGray;
             FieldDataResetButton.ForeColor = SystemColors.ButtonFace;
             FieldDataResetButton.Image = (Image)resources.GetObject("FieldDataResetButton.Image");
-            FieldDataResetButton.Location = new Point(1048, 9);
+            FieldDataResetButton.Location = new Point(887, 9);
             FieldDataResetButton.Name = "FieldDataResetButton";
             FieldDataResetButton.Size = new Size(36, 34);
             FieldDataResetButton.TabIndex = 12;
             FieldDataResetButton.UseVisualStyleBackColor = false;
-            FieldDataResetButton.Click += FieldDataResetButton_Click;
+            FieldDataResetButton.Click += ResetFormFieldsButton_Click;
             // 
             // DataLoadButton
             // 
@@ -164,7 +165,7 @@
             DataLoadButton.AutoSize = true;
             DataLoadButton.Location = new Point(33, 92);
             DataLoadButton.Name = "DataLoadButton";
-            DataLoadButton.Size = new Size(166, 56);
+            DataLoadButton.Size = new Size(164, 56);
             DataLoadButton.TabIndex = 13;
             DataLoadButton.Text = "Загрузить данные";
             DataLoadButton.UseVisualStyleBackColor = true;
@@ -174,7 +175,8 @@
             // 
             panel1.BackColor = Color.Transparent;
             panel1.BorderStyle = BorderStyle.Fixed3D;
-            panel1.Controls.Add(dataLoadProgressBar);
+            panel1.Controls.Add(FileSizeLabel);
+            panel1.Controls.Add(DataLoadProgressBar);
             panel1.Controls.Add(FieldDataResetButton);
             panel1.Controls.Add(DataLoadButton);
             panel1.Controls.Add(BrowseDirectoryImportField);
@@ -182,19 +184,26 @@
             panel1.Controls.Add(DirectoryImportButton);
             panel1.Location = new Point(23, 29);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1100, 169);
+            panel1.Size = new Size(940, 169);
             panel1.TabIndex = 14;
             // 
-            // dataLoadProgressBar
+            // FileSizeLabel
             // 
-            dataLoadProgressBar.Location = new Point(33, 148);
-            dataLoadProgressBar.Name = "dataLoadProgressBar";
-            dataLoadProgressBar.RightToLeft = RightToLeft.No;
-            dataLoadProgressBar.Size = new Size(184, 5);
-            dataLoadProgressBar.Step = 1;
-            dataLoadProgressBar.Style = ProgressBarStyle.Continuous;
-            dataLoadProgressBar.TabIndex = 14;
-            dataLoadProgressBar.Visible = false;
+            FileSizeLabel.AutoSize = true;
+            FileSizeLabel.Location = new Point(224, 106);
+            FileSizeLabel.Name = "FileSizeLabel";
+            FileSizeLabel.Size = new Size(0, 23);
+            FileSizeLabel.TabIndex = 15;
+            // 
+            // DataLoadProgressBar
+            // 
+            DataLoadProgressBar.Location = new Point(33, 148);
+            DataLoadProgressBar.Name = "DataLoadProgressBar";
+            DataLoadProgressBar.RightToLeft = RightToLeft.No;
+            DataLoadProgressBar.Size = new Size(164, 5);
+            DataLoadProgressBar.Style = ProgressBarStyle.Continuous;
+            DataLoadProgressBar.TabIndex = 14;
+            DataLoadProgressBar.Visible = false;
             // 
             // panel2
             // 
@@ -203,23 +212,33 @@
             panel2.Controls.Add(DirectoryExportButton);
             panel2.Controls.Add(BrowseDirectoryExportField);
             panel2.Controls.Add(SaveFileText);
-            panel2.Location = new Point(23, 785);
+            panel2.Location = new Point(969, 29);
             panel2.Name = "panel2";
-            panel2.Size = new Size(789, 117);
+            panel2.Size = new Size(926, 117);
             panel2.TabIndex = 14;
             // 
             // panel3
             // 
             panel3.BackColor = Color.Transparent;
             panel3.BorderStyle = BorderStyle.Fixed3D;
+            panel3.Controls.Add(CategoryTree);
             panel3.Controls.Add(CheckAll);
-            panel3.Controls.Add(CategoriesListCheckBox);
             panel3.Controls.Add(CategoryListText);
             panel3.Controls.Add(label1);
             panel3.Location = new Point(23, 222);
             panel3.Name = "panel3";
-            panel3.Size = new Size(1100, 379);
+            panel3.Size = new Size(940, 676);
             panel3.TabIndex = 15;
+            // 
+            // CategoryTree
+            // 
+            CategoryTree.BackColor = SystemColors.MenuBar;
+            CategoryTree.FullRowSelect = true;
+            CategoryTree.Location = new Point(33, 41);
+            CategoryTree.Name = "CategoryTree";
+            CategoryTree.Size = new Size(869, 600);
+            CategoryTree.TabIndex = 17;
+            CategoryTree.AfterCheck += CategoryTree_AfterCheck;
             // 
             // CheckAll
             // 
@@ -231,22 +250,6 @@
             CheckAll.Text = "Выбрать все";
             CheckAll.UseVisualStyleBackColor = true;
             CheckAll.Click += CheckAll_Click;
-            // 
-            // CategoriesListCheckBox
-            // 
-            CategoriesListCheckBox.BackColor = SystemColors.MenuBar;
-            CategoriesListCheckBox.CheckOnClick = true;
-            CategoriesListCheckBox.ColumnWidth = 300;
-            CategoriesListCheckBox.Cursor = Cursors.Hand;
-            CategoriesListCheckBox.FormattingEnabled = true;
-            CategoriesListCheckBox.ImeMode = ImeMode.NoControl;
-            CategoriesListCheckBox.Location = new Point(33, 41);
-            CategoriesListCheckBox.MultiColumn = true;
-            CategoriesListCheckBox.Name = "CategoriesListCheckBox";
-            CategoriesListCheckBox.Size = new Size(1023, 304);
-            CategoriesListCheckBox.Sorted = true;
-            CategoriesListCheckBox.TabIndex = 2;
-            CategoriesListCheckBox.ThreeDCheckBoxes = true;
             // 
             // CategoryListText
             // 
@@ -264,21 +267,21 @@
             label1.Size = new Size(100, 23);
             label1.TabIndex = 0;
             // 
-            // feedCreatorProgressBar
+            // FeedCreatorProgressBar
             // 
-            feedCreatorProgressBar.Location = new Point(23, 754);
-            feedCreatorProgressBar.Name = "feedCreatorProgressBar";
-            feedCreatorProgressBar.Size = new Size(789, 17);
-            feedCreatorProgressBar.TabIndex = 16;
-            feedCreatorProgressBar.Visible = false;
+            FeedCreatorProgressBar.Location = new Point(1007, 359);
+            FeedCreatorProgressBar.Name = "FeedCreatorProgressBar";
+            FeedCreatorProgressBar.Size = new Size(800, 17);
+            FeedCreatorProgressBar.TabIndex = 16;
+            FeedCreatorProgressBar.Visible = false;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(9F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
-            ClientSize = new Size(1148, 923);
-            Controls.Add(feedCreatorProgressBar);
+            ClientSize = new Size(1924, 923);
+            Controls.Add(FeedCreatorProgressBar);
             Controls.Add(panel3);
             Controls.Add(VKFeedButton);
             Controls.Add(TwoGisFeedButton);
@@ -318,9 +321,10 @@
         private Panel panel2;
         private Panel panel3;
         private Label CategoryListText;
-        private CheckedListBox CategoriesListCheckBox;
         private CheckBox CheckAll;
-        private ProgressBar dataLoadProgressBar;
-        private ProgressBar feedCreatorProgressBar;
+        private ProgressBar DataLoadProgressBar;
+        private ProgressBar FeedCreatorProgressBar;
+        private TreeView CategoryTree;
+        private Label FileSizeLabel;
     }
 }

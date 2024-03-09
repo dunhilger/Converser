@@ -3,6 +3,7 @@ using ConverserLibrary.Dto;
 using ConverserLibrary.Interfaces;
 using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 
 namespace ConverserWF
 {
@@ -15,6 +16,20 @@ namespace ConverserWF
         private readonly ITwoGisFeedCreatorService _twoGisFeedCreatorService;
         private readonly IVKFeedCreatorService _vkFeedCreatorService;
         // private readonly IInformationService _information;
+
+        /// <summary>
+        /// Инициализарует подсказки для контролов формы
+        /// </summary>
+        private void InitializeTooltips()
+        {
+            var toolTip = new ToolTip();
+            toolTip.ToolTipTitle = "Подсказка";
+            toolTip.SetToolTip(DataLoadButton, "Загрузить данные из файла");
+            toolTip.SetToolTip(YandexFeedButton, "Создать XML-фид для Яндекс");
+            toolTip.SetToolTip(VKFeedButton, "Создать XML-фид для ВКонтакте");
+            toolTip.SetToolTip(TwoGisFeedButton, "Создать XML-фид для 2ГИС");
+            toolTip.SetToolTip(FieldDataResetButton, "Сбросить данные");
+        }
 
         /// <summary>
         /// Инициализирует экземпляр класса MainService.
@@ -32,6 +47,7 @@ namespace ConverserWF
             IVKFeedCreatorService vkFeedCreatorService)
         {
             InitializeComponent();
+            InitializeTooltips();
             _logger = logger;
             _parser = parser;
             _separator = separator;
@@ -94,41 +110,69 @@ namespace ConverserWF
         /// <param name="createXml">Метод создания XML-файлов</param>
         private void HandleFeedButtonClick(Action<string, CitySeparatorResult> createXml)
         {
-            _logger.LogInformation($"Старт обработки. Файл: {_filePathImport}");
+            var selectedCategories = GetAllCheckedNodes(CategoryTree.Nodes)
+            .Select(node => node.Tag as Category)
+            .Where(category => category is not null)
+            .ToList();
 
-            _cityDictionary.Categories.Clear();
-
-            var citySeparatorResult = new CitySeparatorResult();
-
-            foreach (Category category in CategoriesListCheckBox.CheckedItems)
+            if (selectedCategories.Count > 0)
             {
-                feedCreatorProgressBar.Maximum = CategoriesListCheckBox.CheckedItems.Count;
-                feedCreatorProgressBar.Visible = true;
+                _logger.LogInformation($"Старт обработки. Файл: {_filePathImport}");
 
-                foreach (var city in _cityDictionary.CityProducts.Keys)
+                var citySeparatorResult = new CitySeparatorResult();
+
+                foreach (var selectedCategory in selectedCategories)
                 {
-                    foreach (var product in _cityDictionary.CityProducts[city])
-                    {
-                        if (product.CategoryId == category.ID)
-                        {
-                            if (!citySeparatorResult.CityProducts.TryGetValue(city, out List<Product> value))
-                            {
-                                value = new List<Product>();
-                                citySeparatorResult.CityProducts[city] = value;
-                            }
+                    FeedCreatorProgressBar.Maximum = selectedCategories.Count;
+                    FeedCreatorProgressBar.Visible = true;
 
-                            value.Add(product);
+                    foreach (var city in _cityDictionary.CityProducts.Keys)
+                    {
+                        foreach (var product in _cityDictionary.CityProducts[city])
+                        {
+                            if (selectedCategory is not null && product.CategoryId == selectedCategory.ID)
+                            {
+                                if (!citySeparatorResult.CityProducts.TryGetValue(city, out List<Product> value))
+                                {
+                                    value = new List<Product>();
+                                    citySeparatorResult.CityProducts[city] = value;
+                                }
+
+                                value.Add(product);
+                            }
                         }
                     }
+
+                    FeedCreatorProgressBar.Value++;
+                    citySeparatorResult.Categories.Add(selectedCategory); // в списке категорий фидов остаются только выбранные категории               
                 }
 
-                feedCreatorProgressBar.Value++;
-                citySeparatorResult.Categories.Add(category);// в списке категорий фидов остаются только выбранные категории               
+                createXml(Path.GetDirectoryName(_filePathExport), citySeparatorResult);
+
+                _logger.LogInformation("Генерация XML-файлов завершена.");
             }
+            else
+            {
+                MessageBox.Show(this, "Нет выбранных категорий для создания фидов.", "Внимание",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
 
-            createXml(Path.GetDirectoryName(_filePathExport), citySeparatorResult);
+        /// <summary>
+        /// Обходит дерево и выбирает все выбранные категории
+        /// </summary>
+        /// <param name="nodes">Коллекция узлов для обхода.</param>
+        /// <returns>Перечисление выбранных узлов.</returns>
+        private IEnumerable<TreeNode> GetAllCheckedNodes(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                if (node.Checked)
+                    yield return node;
 
-            _logger.LogInformation("Генерация XML-файлов завершена.");
+                foreach (var childNode in GetAllCheckedNodes(node.Nodes))
+                    yield return childNode;
+            }
         }
 
         /// <summary>
@@ -138,43 +182,120 @@ namespace ConverserWF
         /// <param name="e">Аргументы события Click.</param>
         private void DataLoadButton_Click(object sender, EventArgs e)
         {
-            CategoriesListCheckBox.Items.Clear();
+            CategoryTree.Nodes.Clear();
+            CategoryTree.CheckBoxes = true;
+
             CheckAll.Enabled = true;
             CheckAll.Checked = false;
-            
+
             var products = _parser.GetXLSXFile(_filePathImport);
             _cityDictionary = _separator.SeparateByCity(products);
 
-            dataLoadProgressBar.Maximum = _cityDictionary.Categories.Count;
+            DataLoadProgressBar.Visible = true;
+            DataLoadProgressBar.Maximum = _cityDictionary.Categories
+                .Count(c => string.IsNullOrEmpty(c.ParentID));
 
-            if (_cityDictionary.Categories.Count > 0 && 
-                _cityDictionary.CityProducts.Count > 0 &&
-                _cityDictionary.CityProducts.Keys.Count > 0)
+            if (IsVlidExcelFile(_filePathImport))
             {
-                foreach (var category in _cityDictionary.Categories)
+                foreach (var category in _cityDictionary.Categories.Where(c => c.ParentID == null))
                 {
-                    CategoriesListCheckBox.Items.Add(new Category
+                    var rootNode = new TreeNode($"{category.Value} [{category.ID}]")
                     {
-                        ID = category.ID,
-                        Value = category.Value,
-                        ParentID = category.ParentID
-                    });
+                        Tag = category
+                    };
 
-                    dataLoadProgressBar.Value++;
+                    BuildCategoryTree(category, rootNode.Nodes);
+
+                    CategoryTree.Nodes.Add(rootNode);
+
+                    DataLoadProgressBar.Value++;
                 }
 
+                DataLoadProgressBar.Hide();
                 DataLoadButton.Text = "Загружено успешно!";
+                FileSizeLabel.Text = $"Размер файла: {GetFormatFileSize(_filePathImport)}";
+                CategoryTree.ExpandAll();
                 DataLoadButton.Enabled = false;
                 YandexFeedButton.Enabled = true;
                 VKFeedButton.Enabled = true;
                 TwoGisFeedButton.Enabled = true;
-                dataLoadProgressBar.Visible = true;
+                CheckAll.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
             }
             else
             {
                 MessageBox.Show(this, "Выбранный файл Excel не подходит для создания фидов.", "Внимание",
                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                FieldDataResetButton_Click(this, new EventArgs());
+                ResetFormFieldsButton_Click(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Представляет размер файла в надлежащем формате
+        /// </summary>
+        /// <param name="filePath">Путь к файлу.</param>
+        /// <returns>Размер файла типа string.</returns>
+        private static string GetFormatFileSize(string filePath)
+        {
+            long fileSize = new FileInfo(filePath).Length;
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            int sizeUnitPosition = 0;
+            double length = fileSize;
+
+            while (length >= 1024 && sizeUnitPosition < sizes.Length - 1)
+            {
+                sizeUnitPosition++;
+                length /= 1024;
+            }
+
+            return $"{Math.Round(length, 2)} {sizes[sizeUnitPosition]}";
+        }
+
+        /// <summary>
+        /// Построение дерева категорий для указанной родительской категории.
+        /// </summary>
+        /// <param name="parentCategory">Родительскася категория.</param>
+        /// <param name="nodes">Коллекция узлов дерева, к которой добавляются дочерние узлы.</param>
+        private void BuildCategoryTree(Category parentCategory, TreeNodeCollection nodes)
+        {
+            var childCategories = _cityDictionary.Categories.Where(c => c.ParentID == parentCategory.ID);
+
+            foreach (var childCategory in childCategories)
+            {
+                var childNode = new TreeNode($"{childCategory.Value} [{childCategory.ID}]")
+                {
+                    Tag = childCategory
+                };
+
+                if (!nodes.Cast<TreeNode>().Any(existNode => existNode.Tag == childNode.Tag))
+                {
+                    nodes.Add(childNode);
+                }
+
+                BuildCategoryTree(childCategory, childNode.Nodes);
+            }
+        }
+
+        /// <summary>
+        /// Управляет галочками в дочерних и родительских узлах.
+        /// </summary>
+        /// <param name="sender">Объект, вызвавший событие.</param>
+        /// <param name="e">Аргументы события AfterCheck.</param>
+        private void CategoryTree_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (e.Action is not TreeViewAction.Unknown)
+            {
+                if (e.Node.Nodes.Count > 0)
+                {
+                    foreach (TreeNode childNode in e.Node.Nodes)
+                    {
+                        childNode.Checked = e.Node.Checked;
+                    }
+                }
+
+                if (e.Node.Parent is not null)
+                {
+                    e.Node.Parent.Checked = e.Node.Parent.Nodes.Cast<TreeNode>().Any(node => node.Checked);
+                }
             }
         }
 
@@ -182,18 +303,31 @@ namespace ConverserWF
         /// Обработчик события CheckAll_Click. Устанавливает/снимает все галочки
         /// </summary>
         /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события DragEnter.</param>
+        /// <param name="e">Аргументы события CheckAll_Click.</param>
         private void CheckAll_Click(object sender, EventArgs e)
         {
-            CategoriesListCheckBox.SetItemChecked(0, !CategoriesListCheckBox.GetItemChecked(0));
+            bool selectAll = !CategoryTree.Nodes.Cast<TreeNode>().All(node => node.Checked);
 
-            bool selectAll = CategoriesListCheckBox.GetItemChecked(0);
-
-            for (int i = 1; i < CategoriesListCheckBox.Items.Count; i++)
+            foreach (TreeNode node in CategoryTree.Nodes)
             {
-                CategoriesListCheckBox.SetItemChecked(i, selectAll);
+                SetCheckChildNode(node, selectAll);
             }
-        }///установка галочек с клавиатуры - убрать
+        }
+
+        /// <summary>
+        /// Рекурсивно устанавливает галочку для дочерних категорий, начиная с указанного узла.
+        /// </summary>
+        /// <param name="node">Начальный узел</param>
+        /// <param name="isChecked">Признак выбора категории</param>
+        private static void SetCheckChildNode(TreeNode node, bool isChecked)
+        {
+            node.Checked = isChecked;
+
+            foreach (TreeNode childNode in node.Nodes)
+            {
+                SetCheckChildNode(childNode, isChecked);
+            }
+        }
 
         /// <summary>
         /// Обработчик события DragEnter для контрола, позволяющий перетаскивать файлы.
@@ -239,6 +373,8 @@ namespace ConverserWF
                     BrowseDirectoryExportField.Text = Path.GetDirectoryName(_filePathImport);
                 }
 
+                ClearUIState();
+
                 ProcessFile(_filePathImport);
 
                 BrowseDirectoryImportField.Text = _filePathImport;
@@ -262,16 +398,8 @@ namespace ConverserWF
                 if (dialogResult == DialogResult.OK)
                 {
                     _filePathImport = openFileDialog.FileName;
-                    // частично дублирует FieldDataResetButton_Click →
-                    DataLoadButton.Text = "Загрузить данные";
-                    CheckAll.Checked = false;
-                    CheckAll.Enabled = false;
-                    CategoriesListCheckBox.Items.Clear();
-                    YandexFeedButton.Enabled = false;
-                    VKFeedButton.Enabled = false;
-                    TwoGisFeedButton.Enabled = false;
-                    dataLoadProgressBar.Visible = false;
-                    dataLoadProgressBar.Value = 0;
+
+                    ClearUIState();
 
                     if (string.IsNullOrEmpty(_filePathExport) || _filePathExport != _filePathImport)
                     {
@@ -334,26 +462,48 @@ namespace ConverserWF
         }
 
         /// <summary>
-        /// Обработчик события Click для контрола сброса данных в диалоговых окнах.
+        /// Обработчик события Click для контрола сброса данных в полях формы либо присваивания им 
+        /// значений по умолчанию.
         /// </summary>
         // <param name="sender">Объект, вызвавший событие.</param>
         /// <param name="e">Аргументы события Click.</param>
-        public void FieldDataResetButton_Click(object sender, EventArgs e)
+        private void ResetFormFieldsButton_Click(object sender, EventArgs e)
         {
             _filePathExport = null;
             _filePathImport = null;
             BrowseDirectoryExportField.Text = string.Empty;
             BrowseDirectoryImportField.Text = string.Empty;
-            YandexFeedButton.Enabled = false;
-            VKFeedButton.Enabled = false;
-            TwoGisFeedButton.Enabled = false;
+            YandexFeedButton.Enabled = false; //
+            VKFeedButton.Enabled = false; //
+            TwoGisFeedButton.Enabled = false; //
             DataLoadButton.Enabled = false;
-            DataLoadButton.Text = "Загрузить данные";
-            CategoriesListCheckBox.Items.Clear();
-            CheckAll.Enabled = false;
-            CheckAll.Checked = false;
-            dataLoadProgressBar.Visible = false;
-            dataLoadProgressBar.Value = 0;
+            DataLoadButton.Text = "Загрузить данные"; //
+            CategoryTree.Nodes.Clear(); //
+            CheckAll.Enabled = false; //
+            CheckAll.Checked = false; //
+            CheckAll.Text = "Выбрать все"; //
+            DataLoadProgressBar.Visible = false; //
+            DataLoadProgressBar.Value = 0; //
+            FileSizeLabel.Text = ""; //
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ClearUIState()
+        {
+            DataLoadButton.Text = "Загрузить данные"; //
+            CheckAll.Checked = false; //
+            CheckAll.Enabled = false; //
+            CheckAll.Text = "Выбрать все"; //
+            CategoryTree.Nodes.Clear(); //
+            YandexFeedButton.Enabled = false; //
+            VKFeedButton.Enabled = false; //
+            TwoGisFeedButton.Enabled = false; //
+            DataLoadProgressBar.Visible = false; //
+            DataLoadProgressBar.Value = 0; //
+            FeedCreatorProgressBar.Value = 0; //---
+            FileSizeLabel.Text = ""; //
         }
 
         /// <summary>
@@ -365,6 +515,33 @@ namespace ConverserWF
         {
             return Path.GetExtension(filePath).Equals(".xlsx", StringComparison.OrdinalIgnoreCase)
                 || Path.GetExtension(filePath).Equals(".xls", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Проверка совместимости файла Excel с возможностью создания фидов
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private bool IsVlidExcelFile(string filePath)
+        {
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[0];
+
+                if (worksheet == null ||
+                    worksheet.Cells["A1"].Text != "Город" ||
+                    worksheet.Cells["C1"].Text != "КартинкаКрупная" ||
+                    worksheet.Cells["D1"].Text != "Название_блюда" ||
+                    worksheet.Cells["G1"].Text != "ИдМпМенюКатегория" ||
+                    worksheet.Cells["I1"].Text != "Описание" ||
+                    worksheet.Cells["M1"].Text != "ВесГраммы" ||
+                    worksheet.Cells["AA1"].Text != "ИдКатегория")
+                {
+                    return false;
+                }
+
+                else return true;
+            }
         }
 
         // private void SendInformation(string text)
