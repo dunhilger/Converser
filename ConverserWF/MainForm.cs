@@ -25,9 +25,9 @@ namespace ConverserWF
             var toolTip = new ToolTip();
             toolTip.ToolTipTitle = "Подсказка";
             toolTip.SetToolTip(DataLoadButton, "Загрузить данные из файла");
-            toolTip.SetToolTip(YandexFeedButton, "Создать XML-фид для Яндекс");
-            toolTip.SetToolTip(VKFeedButton, "Создать XML-фид для ВКонтакте");
-            toolTip.SetToolTip(TwoGisFeedButton, "Создать XML-фид для 2ГИС");
+            //toolTip.SetToolTip(YandexFeedButton, "Создать XML-фид для Яндекс");
+            //toolTip.SetToolTip(VKFeedButton, "Создать XML-фид для ВКонтакте");
+            //toolTip.SetToolTip(TwoGisFeedButton, "Создать XML-фид для 2ГИС");
             toolTip.SetToolTip(FieldDataResetButton, "Сбросить данные");
         }
 
@@ -55,9 +55,9 @@ namespace ConverserWF
             _twoGisFeedCreatorService = twoGisFeedCreatorService;
             _vkFeedCreatorService = vkFeedCreatorService;
 
-            YandexFeedButton.Enabled = false;
-            VKFeedButton.Enabled = false;
-            TwoGisFeedButton.Enabled = false;
+            //YandexFeedButton.Enabled = false;
+            //VKFeedButton.Enabled = false;
+            //TwoGisFeedButton.Enabled = false;
             DataLoadButton.Enabled = false;
             CheckAll.Enabled = false;
         }
@@ -73,35 +73,65 @@ namespace ConverserWF
 
         private static CitySeparatorResult _cityDictionary;
 
-        /// <summary>
-        /// Обработчик события Click для кнопки YandexFeedButton.
-        /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
-        private void YandexFeedButton_Click(object sender, EventArgs e)
+        private RadioButton _selectedRadioButton;
+
+        ///// <summary>
+        ///// Обработчик события Click для кнопки YandexFeedButton.
+        ///// </summary>
+        ///// <param name="sender">Объект, вызвавший событие.</param>
+        ///// <param name="e">Аргументы события Click.</param>
+        //private void YandexFeedButton_Click(object sender, EventArgs e)
+        //{
+        //    HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml);
+        //}
+
+        ///// <summary>
+        ///// Обработчик события Click для кнопки VKFeedButton.
+        ///// </summary>
+        ///// <param name="sender">Объект, вызвавший событие.</param>
+        ///// <param name="e">Аргументы события Click.</param>
+        //private void VKFeedButton_Click(object sender, EventArgs e)
+        //{
+        //    HandleFeedButtonClick(_vkFeedCreatorService.CreateXml);
+        //}
+
+        ///// <summary>
+        ///// Обработчик события Click для кнопки TwoGisFeedButton.
+        ///// </summary>
+        ///// <param name="sender">Объект, вызвавший событие.</param>
+        ///// <param name="e">Аргументы события Click.</param>
+        //private void TwoGisFeedButton_Click(object sender, EventArgs e)
+        //{
+        //    HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml);
+        //}
+
+        private void RadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml);
+            if (sender is RadioButton radioButton && radioButton.Checked)
+            {
+                _selectedRadioButton = radioButton;
+            }
         }
 
-        /// <summary>
-        /// Обработчик события Click для кнопки VKFeedButton.
-        /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
-        private void VKFeedButton_Click(object sender, EventArgs e)
+        private void AcceptButton_Click(object sender, EventArgs e)
         {
-            HandleFeedButtonClick(_vkFeedCreatorService.CreateXml);
+            if (_selectedRadioButton != null)
+            {
+                if (_selectedRadioButton == RadioButtonYandex)
+                {
+                    HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml);
+                }
+                else if (_selectedRadioButton == RadioButton2gis)
+                {
+                    HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml);
+                }
+                else if (_selectedRadioButton == RadioButtonVK)
+                {
+                    HandleFeedButtonClick(_vkFeedCreatorService.CreateXml);
+                }
+            }
         }
 
-        /// <summary>
-        /// Обработчик события Click для кнопки TwoGisFeedButton.
-        /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
-        private void TwoGisFeedButton_Click(object sender, EventArgs e)
-        {
-            HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml);
-        }
 
         /// <summary>
         /// Обработчик для кнопок генерации фидов. Принимает делегат, соответствующий
@@ -144,11 +174,11 @@ namespace ConverserWF
                     }
 
                     FeedCreatorProgressBar.Value++;
-                    citySeparatorResult.Categories.Add(selectedCategory); // в списке категорий фидов остаются только выбранные категории               
+                    citySeparatorResult.Categories.Add(selectedCategory); 
                 }
 
                 createXml(Path.GetDirectoryName(_filePathExport), citySeparatorResult);
-
+                FeedCreatorProgressBar.Value = 0;
                 _logger.LogInformation("Генерация XML-файлов завершена.");
             }
             else
@@ -216,9 +246,9 @@ namespace ConverserWF
                 FileSizeLabel.Text = $"Размер файла: {GetFormatFileSize(_filePathImport)}";
                 CategoryTree.ExpandAll();
                 DataLoadButton.Enabled = false;
-                YandexFeedButton.Enabled = true;
-                VKFeedButton.Enabled = true;
-                TwoGisFeedButton.Enabled = true;
+                //YandexFeedButton.Enabled = true;
+                //VKFeedButton.Enabled = true;
+                //TwoGisFeedButton.Enabled = true;
                 CheckAll.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
             }
             else
@@ -454,9 +484,9 @@ namespace ConverserWF
             else
             {
                 MessageBox.Show($"Выбранный файл не является файлом Excel:\n{selectedFile}");
-                YandexFeedButton.Enabled = false;
-                VKFeedButton.Enabled = false;
-                TwoGisFeedButton.Enabled = false;
+                //YandexFeedButton.Enabled = false;
+                //VKFeedButton.Enabled = false;
+                //TwoGisFeedButton.Enabled = false;
                 DataLoadButton.Enabled = false;
             }
         }
@@ -473,9 +503,9 @@ namespace ConverserWF
             _filePathImport = null;
             BrowseDirectoryExportField.Text = string.Empty;
             BrowseDirectoryImportField.Text = string.Empty;
-            YandexFeedButton.Enabled = false; //
-            VKFeedButton.Enabled = false; //
-            TwoGisFeedButton.Enabled = false; //
+            //YandexFeedButton.Enabled = false; //
+            //VKFeedButton.Enabled = false; //
+            //TwoGisFeedButton.Enabled = false; //
             DataLoadButton.Enabled = false;
             DataLoadButton.Text = "Загрузить данные"; //
             CategoryTree.Nodes.Clear(); //
@@ -497,9 +527,9 @@ namespace ConverserWF
             CheckAll.Enabled = false; //
             CheckAll.Text = "Выбрать все"; //
             CategoryTree.Nodes.Clear(); //
-            YandexFeedButton.Enabled = false; //
-            VKFeedButton.Enabled = false; //
-            TwoGisFeedButton.Enabled = false; //
+            //YandexFeedButton.Enabled = false; //
+            //VKFeedButton.Enabled = false; //
+            //TwoGisFeedButton.Enabled = false; //
             DataLoadProgressBar.Visible = false; //
             DataLoadProgressBar.Value = 0; //
             FeedCreatorProgressBar.Value = 0; //---
