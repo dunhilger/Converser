@@ -37,11 +37,11 @@
             DirectoryExportButton = new Button();
             BrowseDirectoryImportField = new TextBox();
             BrowseDirectoryExportField = new TextBox();
-            FieldDataResetButton = new Button();
+            ResetButton = new Button();
             DataLoadButton = new Button();
             FileSizeLabel = new Label();
             DataLoadProgressBar = new ProgressBar();
-            CategoryTree = new TreeView();
+            CategoryTreePanel = new TreeView();
             CheckAll = new CheckBox();
             FeedCreatorProgressBar = new ProgressBar();
             panel4 = new Panel();
@@ -60,7 +60,7 @@
             panel15 = new Panel();
             panel16 = new Panel();
             RadioButtonPanel = new Panel();
-            AcceptFeedCreateButton = new Button();
+            ExportButton = new Button();
             RadioButtonVK = new RadioButton();
             RadioButton2gis = new RadioButton();
             RadioButtonYandex = new RadioButton();
@@ -178,17 +178,17 @@
             BrowseDirectoryExportField.TabIndex = 11;
             BrowseDirectoryExportField.Click += BrowseExportDirectory_Click;
             // 
-            // FieldDataResetButton
+            // ResetButton
             // 
-            FieldDataResetButton.BackColor = Color.LightGray;
-            FieldDataResetButton.ForeColor = SystemColors.ButtonFace;
-            FieldDataResetButton.Image = (Image)resources.GetObject("FieldDataResetButton.Image");
-            FieldDataResetButton.Location = new Point(734, 184);
-            FieldDataResetButton.Name = "FieldDataResetButton";
-            FieldDataResetButton.Size = new Size(36, 34);
-            FieldDataResetButton.TabIndex = 12;
-            FieldDataResetButton.UseVisualStyleBackColor = false;
-            FieldDataResetButton.Click += ResetFormFieldsButton_Click;
+            ResetButton.BackColor = Color.LightGray;
+            ResetButton.ForeColor = SystemColors.ButtonFace;
+            ResetButton.Image = (Image)resources.GetObject("ResetButton.Image");
+            ResetButton.Location = new Point(734, 184);
+            ResetButton.Name = "ResetButton";
+            ResetButton.Size = new Size(36, 34);
+            ResetButton.TabIndex = 12;
+            ResetButton.UseVisualStyleBackColor = false;
+            ResetButton.Click += ResetButton_Click;
             // 
             // DataLoadButton
             // 
@@ -223,15 +223,15 @@
             DataLoadProgressBar.TabIndex = 14;
             DataLoadProgressBar.Visible = false;
             // 
-            // CategoryTree
+            // CategoryTreePanel
             // 
-            CategoryTree.BackColor = SystemColors.MenuBar;
-            CategoryTree.FullRowSelect = true;
-            CategoryTree.Location = new Point(22, 56);
-            CategoryTree.Name = "CategoryTree";
-            CategoryTree.Size = new Size(584, 543);
-            CategoryTree.TabIndex = 17;
-            CategoryTree.AfterCheck += CategoryTree_AfterCheck;
+            CategoryTreePanel.BackColor = SystemColors.MenuBar;
+            CategoryTreePanel.FullRowSelect = true;
+            CategoryTreePanel.Location = new Point(22, 56);
+            CategoryTreePanel.Name = "CategoryTreePanel";
+            CategoryTreePanel.Size = new Size(584, 543);
+            CategoryTreePanel.TabIndex = 17;
+            CategoryTreePanel.AfterCheck += CategoryTree_AfterCheck;
             // 
             // CheckAll
             // 
@@ -312,7 +312,7 @@
             // 
             panel9.AutoSize = true;
             panel9.BackColor = Color.Transparent;
-            panel9.Controls.Add(CategoryTree);
+            panel9.Controls.Add(CategoryTreePanel);
             panel9.Controls.Add(panel10);
             panel9.Controls.Add(CheckAll);
             panel9.Controls.Add(panel11);
@@ -416,7 +416,7 @@
             // 
             RadioButtonPanel.AutoSize = true;
             RadioButtonPanel.BackColor = Color.Transparent;
-            RadioButtonPanel.Controls.Add(AcceptFeedCreateButton);
+            RadioButtonPanel.Controls.Add(ExportButton);
             RadioButtonPanel.Controls.Add(RadioButtonVK);
             RadioButtonPanel.Controls.Add(RadioButton2gis);
             RadioButtonPanel.Controls.Add(RadioButtonYandex);
@@ -431,16 +431,16 @@
             RadioButtonPanel.Size = new Size(733, 218);
             RadioButtonPanel.TabIndex = 24;
             // 
-            // AcceptFeedCreateButton
+            // ExportButton
             // 
-            AcceptFeedCreateButton.ForeColor = Color.Black;
-            AcceptFeedCreateButton.Location = new Point(610, 154);
-            AcceptFeedCreateButton.Name = "AcceptFeedCreateButton";
-            AcceptFeedCreateButton.Size = new Size(94, 29);
-            AcceptFeedCreateButton.TabIndex = 20;
-            AcceptFeedCreateButton.Text = "Ok";
-            AcceptFeedCreateButton.UseVisualStyleBackColor = true;
-            AcceptFeedCreateButton.Click += AcceptButton_Click;
+            ExportButton.ForeColor = Color.Black;
+            ExportButton.Location = new Point(610, 154);
+            ExportButton.Name = "ExportButton";
+            ExportButton.Size = new Size(94, 29);
+            ExportButton.TabIndex = 20;
+            ExportButton.Text = "Экспорт";
+            ExportButton.UseVisualStyleBackColor = true;
+            ExportButton.Click += ExportButton_Click;
             // 
             // RadioButtonVK
             // 
@@ -531,7 +531,7 @@
             Controls.Add(label1);
             Controls.Add(panel1);
             Controls.Add(label2);
-            Controls.Add(FieldDataResetButton);
+            Controls.Add(ResetButton);
             Controls.Add(BrowseFileText);
             Controls.Add(panel4);
             Controls.Add(panel9);
@@ -561,12 +561,12 @@
         private TextBox BrowseDirectoryImportField;
         private Label BrowseFileText;
         private TextBox BrowseDirectoryExportField;
-        private Button FieldDataResetButton;
+        private Button ResetButton;
         private Button DataLoadButton;
         private CheckBox CheckAll;
         private ProgressBar DataLoadProgressBar;
         private ProgressBar FeedCreatorProgressBar;
-        private TreeView CategoryTree;
+        private TreeView CategoryTreePanel;
         private Label FileSizeLabel;
         private Panel panel4;
         private Panel panel5;
@@ -591,6 +591,6 @@
         private RadioButton RadioButtonVK;
         private RadioButton RadioButton2gis;
         private RadioButton RadioButtonYandex;
-        private Button AcceptFeedCreateButton;
+        private Button ExportButton;
     }
 }

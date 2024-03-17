@@ -15,21 +15,24 @@ namespace ConverserWF
         private readonly IYandexFeedCreatorService _yandexFeedCreatorService;
         private readonly ITwoGisFeedCreatorService _twoGisFeedCreatorService;
         private readonly IVKFeedCreatorService _vkFeedCreatorService;
-        // private readonly IInformationService _information;
 
         /// <summary>
         /// Инициализарует подсказки для контролов формы
         /// </summary>
         private void InitializeTooltips()
         {
-            var toolTip = new ToolTip();
-            toolTip.ToolTipTitle = "Подсказка";
+            var toolTip = new ToolTip
+            {
+                ToolTipTitle = "Подсказка"
+            };
             toolTip.SetToolTip(DataLoadButton, "Загрузить данные из файла");
-            //toolTip.SetToolTip(YandexFeedButton, "Создать XML-фид для Яндекс");
-            //toolTip.SetToolTip(VKFeedButton, "Создать XML-фид для ВКонтакте");
-            //toolTip.SetToolTip(TwoGisFeedButton, "Создать XML-фид для 2ГИС");
-            toolTip.SetToolTip(FieldDataResetButton, "Сбросить данные");
+            toolTip.SetToolTip(ResetButton, "Сбросить данные");
         }
+
+        /// <summary>
+        /// Словарь, содержащий ключи - кнопки radioButton, и значения - делегаты.
+        /// </summary>
+        private readonly Dictionary<RadioButton, Action> RadioButtonActions = [];
 
         /// <summary>
         /// Инициализирует экземпляр класса MainService.
@@ -48,16 +51,16 @@ namespace ConverserWF
         {
             InitializeComponent();
             InitializeTooltips();
+            SetEnableStateRadioButton(false);
             _logger = logger;
             _parser = parser;
             _separator = separator;
             _yandexFeedCreatorService = yandexFeedCreatorService;
             _twoGisFeedCreatorService = twoGisFeedCreatorService;
             _vkFeedCreatorService = vkFeedCreatorService;
-
-            //YandexFeedButton.Enabled = false;
-            //VKFeedButton.Enabled = false;
-            //TwoGisFeedButton.Enabled = false;
+            RadioButtonActions.Add(RadioButtonYandex, () => HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml));
+            RadioButtonActions.Add(RadioButton2gis, () => HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml));
+            RadioButtonActions.Add(RadioButtonVK, () => HandleFeedButtonClick(_vkFeedCreatorService.CreateXml));
             DataLoadButton.Enabled = false;
             CheckAll.Enabled = false;
         }
@@ -75,36 +78,11 @@ namespace ConverserWF
 
         private RadioButton _selectedRadioButton;
 
-        ///// <summary>
-        ///// Обработчик события Click для кнопки YandexFeedButton.
-        ///// </summary>
-        ///// <param name="sender">Объект, вызвавший событие.</param>
-        ///// <param name="e">Аргументы события Click.</param>
-        //private void YandexFeedButton_Click(object sender, EventArgs e)
-        //{
-        //    HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml);
-        //}
-
-        ///// <summary>
-        ///// Обработчик события Click для кнопки VKFeedButton.
-        ///// </summary>
-        ///// <param name="sender">Объект, вызвавший событие.</param>
-        ///// <param name="e">Аргументы события Click.</param>
-        //private void VKFeedButton_Click(object sender, EventArgs e)
-        //{
-        //    HandleFeedButtonClick(_vkFeedCreatorService.CreateXml);
-        //}
-
-        ///// <summary>
-        ///// Обработчик события Click для кнопки TwoGisFeedButton.
-        ///// </summary>
-        ///// <param name="sender">Объект, вызвавший событие.</param>
-        ///// <param name="e">Аргументы события Click.</param>
-        //private void TwoGisFeedButton_Click(object sender, EventArgs e)
-        //{
-        //    HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml);
-        //}
-
+        /// <summary>
+        /// Обработчик события Click для Radio Button.
+        /// </summary>
+        /// <param name="sender">Объект, вызвавший событие.</param>
+        /// <param name="e">Аргументы события Click.</param>
         private void RadioButton_CheckedChanged(object sender, EventArgs e)
         {
             if (sender is RadioButton radioButton && radioButton.Checked)
@@ -113,25 +91,24 @@ namespace ConverserWF
             }
         }
 
-        private void AcceptButton_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Обоработчик события Click для кнопки экспорта.
+        /// </summary>
+        /// <param name="sender">Объект, вызвавший событие.</param>
+        /// <param name="e">Аргументы события Click.</param>
+        private void ExportButton_Click(object sender, EventArgs e)
         {
-            if (_selectedRadioButton != null)
+            if (_selectedRadioButton != null && RadioButtonActions
+                .TryGetValue(_selectedRadioButton, out Action value))
             {
-                if (_selectedRadioButton == RadioButtonYandex)
-                {
-                    HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml);
-                }
-                else if (_selectedRadioButton == RadioButton2gis)
-                {
-                    HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml);
-                }
-                else if (_selectedRadioButton == RadioButtonVK)
-                {
-                    HandleFeedButtonClick(_vkFeedCreatorService.CreateXml);
-                }
+                value.Invoke();
+            }
+            else
+            {
+                MessageBox.Show(this, "Не выбран целевой сервис для создания фидов.", "Внимание",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-
 
         /// <summary>
         /// Обработчик для кнопок генерации фидов. Принимает делегат, соответствующий
@@ -140,7 +117,7 @@ namespace ConverserWF
         /// <param name="createXml">Метод создания XML-файлов</param>
         private void HandleFeedButtonClick(Action<string, CitySeparatorResult> createXml)
         {
-            var selectedCategories = GetAllCheckedNodes(CategoryTree.Nodes)
+            var selectedCategories = GetAllCheckedNodes(CategoryTreePanel.Nodes)
             .Select(node => node.Tag as Category)
             .Where(category => category is not null)
             .ToList();
@@ -189,11 +166,11 @@ namespace ConverserWF
         }
 
         /// <summary>
-        /// Обходит дерево и выбирает все выбранные категории
+        /// Рекурсивно обходит дерево и получает все выбранные узлы категорий.
         /// </summary>
         /// <param name="nodes">Коллекция узлов для обхода.</param>
         /// <returns>Перечисление выбранных узлов.</returns>
-        private IEnumerable<TreeNode> GetAllCheckedNodes(TreeNodeCollection nodes)
+        private static IEnumerable<TreeNode> GetAllCheckedNodes(TreeNodeCollection nodes)
         {
             foreach (TreeNode node in nodes)
             {
@@ -212,8 +189,8 @@ namespace ConverserWF
         /// <param name="e">Аргументы события Click.</param>
         private void DataLoadButton_Click(object sender, EventArgs e)
         {
-            CategoryTree.Nodes.Clear();
-            CategoryTree.CheckBoxes = true;
+            CategoryTreePanel.Nodes.Clear();
+            CategoryTreePanel.CheckBoxes = true;
 
             CheckAll.Enabled = true;
             CheckAll.Checked = false;
@@ -236,7 +213,7 @@ namespace ConverserWF
 
                     BuildCategoryTree(category, rootNode.Nodes);
 
-                    CategoryTree.Nodes.Add(rootNode);
+                    CategoryTreePanel.Nodes.Add(rootNode);
 
                     DataLoadProgressBar.Value++;
                 }
@@ -244,18 +221,15 @@ namespace ConverserWF
                 DataLoadProgressBar.Hide();
                 DataLoadButton.Text = "Загружено успешно!";
                 FileSizeLabel.Text = $"Размер файла: {GetFormatFileSize(_filePathImport)}";
-                CategoryTree.ExpandAll();
+                CategoryTreePanel.ExpandAll();
                 DataLoadButton.Enabled = false;
-                //YandexFeedButton.Enabled = true;
-                //VKFeedButton.Enabled = true;
-                //TwoGisFeedButton.Enabled = true;
                 CheckAll.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
             }
             else
             {
                 MessageBox.Show(this, "Выбранный файл Excel не подходит для создания фидов.", "Внимание",
                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                ResetFormFieldsButton_Click(this, new EventArgs());
+                ResetButton_Click(this, new EventArgs());
             }
         }
 
@@ -285,7 +259,7 @@ namespace ConverserWF
         /// </summary>
         /// <param name="parentCategory">Родительскася категория.</param>
         /// <param name="nodes">Коллекция узлов дерева, к которой добавляются дочерние узлы.</param>
-        private void BuildCategoryTree(Category parentCategory, TreeNodeCollection nodes)
+        private static void BuildCategoryTree(Category parentCategory, TreeNodeCollection nodes)
         {
             var childCategories = _cityDictionary.Categories.Where(c => c.ParentID == parentCategory.ID);
 
@@ -326,6 +300,8 @@ namespace ConverserWF
                 {
                     e.Node.Parent.Checked = e.Node.Parent.Nodes.Cast<TreeNode>().Any(node => node.Checked);
                 }
+
+                UpdateRadioButtonEnableState();
             }
         }
 
@@ -336,12 +312,14 @@ namespace ConverserWF
         /// <param name="e">Аргументы события CheckAll_Click.</param>
         private void CheckAll_Click(object sender, EventArgs e)
         {
-            bool selectAll = !CategoryTree.Nodes.Cast<TreeNode>().All(node => node.Checked);
+            bool selectAll = !CategoryTreePanel.Nodes.Cast<TreeNode>().All(node => node.Checked);
 
-            foreach (TreeNode node in CategoryTree.Nodes)
+            foreach (TreeNode node in CategoryTreePanel.Nodes)
             {
                 SetCheckChildNode(node, selectAll);
             }
+
+            UpdateRadioButtonEnableState();
         }
 
         /// <summary>
@@ -484,9 +462,6 @@ namespace ConverserWF
             else
             {
                 MessageBox.Show($"Выбранный файл не является файлом Excel:\n{selectedFile}");
-                //YandexFeedButton.Enabled = false;
-                //VKFeedButton.Enabled = false;
-                //TwoGisFeedButton.Enabled = false;
                 DataLoadButton.Enabled = false;
             }
         }
@@ -497,24 +472,14 @@ namespace ConverserWF
         /// </summary>
         // <param name="sender">Объект, вызвавший событие.</param>
         /// <param name="e">Аргументы события Click.</param>
-        private void ResetFormFieldsButton_Click(object sender, EventArgs e)
+        private void ResetButton_Click(object sender, EventArgs e)
         {
             _filePathExport = null;
             _filePathImport = null;
             BrowseDirectoryExportField.Text = string.Empty;
             BrowseDirectoryImportField.Text = string.Empty;
-            //YandexFeedButton.Enabled = false; //
-            //VKFeedButton.Enabled = false; //
-            //TwoGisFeedButton.Enabled = false; //
-            DataLoadButton.Enabled = false;
-            DataLoadButton.Text = "Загрузить данные"; //
-            CategoryTree.Nodes.Clear(); //
-            CheckAll.Enabled = false; //
-            CheckAll.Checked = false; //
-            CheckAll.Text = "Выбрать все"; //
-            DataLoadProgressBar.Visible = false; //
-            DataLoadProgressBar.Value = 0; //
-            FileSizeLabel.Text = ""; //
+            DataLoadButton.Enabled = false;          
+            ClearUIState();
         }
 
         /// <summary>
@@ -522,18 +487,38 @@ namespace ConverserWF
         /// </summary>
         private void ClearUIState()
         {
-            DataLoadButton.Text = "Загрузить данные"; //
-            CheckAll.Checked = false; //
-            CheckAll.Enabled = false; //
-            CheckAll.Text = "Выбрать все"; //
-            CategoryTree.Nodes.Clear(); //
-            //YandexFeedButton.Enabled = false; //
-            //VKFeedButton.Enabled = false; //
-            //TwoGisFeedButton.Enabled = false; //
-            DataLoadProgressBar.Visible = false; //
-            DataLoadProgressBar.Value = 0; //
-            FeedCreatorProgressBar.Value = 0; //---
-            FileSizeLabel.Text = ""; //
+            DataLoadButton.Text = "Загрузить данные"; 
+            CheckAll.Checked = false; 
+            CheckAll.Enabled = false; 
+            CheckAll.Text = "Выбрать все"; 
+            CategoryTreePanel.Nodes.Clear(); 
+            DataLoadProgressBar.Visible = false; 
+            DataLoadProgressBar.Value = 0; 
+            FeedCreatorProgressBar.Value = 0; 
+            FileSizeLabel.Text = "";
+            SetEnableStateRadioButton(false);
+        }
+
+        /// <summary>
+        /// Устанавливает для каждой RadioButton состояние активности/неактивности.
+        /// </summary>
+        private void SetEnableStateRadioButton(bool enableStatus)
+        {
+            foreach (RadioButton radioButton in RadioButtonPanel.Controls.OfType<RadioButton>())
+            {
+                radioButton.Enabled = enableStatus;
+                radioButton.Checked = enableStatus; // многократно вызывает RadioButton_CheckedChanged 
+            }
+        }
+
+        /// <summary>
+        /// Обновляет состояние активности RadioButton в зависимости от того, 
+        /// выбран ли хотя бы один узел категории.
+        /// </summary>
+        private void UpdateRadioButtonEnableState()
+        {
+            bool anyCategorySelected = GetAllCheckedNodes(CategoryTreePanel.Nodes).Any();
+            SetEnableStateRadioButton(anyCategorySelected);
         }
 
         /// <summary>
@@ -541,7 +526,7 @@ namespace ConverserWF
         /// </summary>
         /// <param name="filePath">Путь к файлу Excel.</param>
         /// <returns>True, если файл является файлом Excel; в противном случае - false.</returns>
-        private bool IsExcelFile(string filePath)
+        private static bool IsExcelFile(string filePath)
         {
             return Path.GetExtension(filePath).Equals(".xlsx", StringComparison.OrdinalIgnoreCase)
                 || Path.GetExtension(filePath).Equals(".xls", StringComparison.OrdinalIgnoreCase);
@@ -552,7 +537,7 @@ namespace ConverserWF
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        private bool IsVlidExcelFile(string filePath)
+        private static bool IsVlidExcelFile(string filePath)
         {
             using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
@@ -573,10 +558,5 @@ namespace ConverserWF
                 else return true;
             }
         }
-
-        // private void SendInformation(string text)
-        // {
-        //     InformationTextBox.Text += text;
-        // }
     }
 }
