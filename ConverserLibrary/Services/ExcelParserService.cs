@@ -23,9 +23,9 @@ namespace ConverserLibrary
             Weight,
             Quantity,
             Description,
-            JapaneseCuisineStation,
+            //JapaneseCuisineStation,
             BitrixCode,
-            PanasianCuisineStation,
+            //PanasianCuisineStation,
             CategoryName,
             ParentCategoryId,
             ParentCategoryName,
@@ -50,7 +50,9 @@ namespace ConverserLibrary
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-
+            // TODO: Определять в каком номере столбца находится заголовок,
+            // запоминать номер и передавать вместо константного значения для 
+            // каждой FieldData.
             var commercialName = new FieldData(5, "CommercialName", (v, p) => p.CommercialName = v);
             var technicalName = new FieldData(4, "TechnicalName", (v, p) => p.TechnicalName = v);
             var price = new FieldData(6, "Price", (v, p) => p.Price = GetNumericValue(v));
@@ -60,10 +62,10 @@ namespace ConverserLibrary
             var bitrixCode = new FieldData(20, "BitrixCode", (v, p) => p.BitrixCode = v);
             var quantity = new FieldData(14, "Quantity", (v, p) => p.Quantity = GetNumericValue(v));
             var description = new FieldData(9, "Description", (v, p) => p.Description = v);
-            var japaneseCuisineStation = new FieldData(25, "JapaneseCuisineStation",
-                (v, p) => p.JapaneseCuisineStationQuantity = GetIntValue(v));
-            var panasianCuisineStation = new FieldData(26, "PanasianCuisineStation",
-                (v, p) => p.PanasianCuisineStationQuantity = GetIntValue(v));
+            //var japaneseCuisineStation = new FieldData(25, "JapaneseCuisineStation",
+            //    (v, p) => p.JapaneseCuisineStationQuantity = GetIntValue(v));
+            //var panasianCuisineStation = new FieldData(26, "PanasianCuisineStation",
+            //    (v, p) => p.PanasianCuisineStationQuantity = GetIntValue(v));
             var categoryName = new FieldData(8, "CategoryName", (v, p) => p.CategoryName = v);
             var parentCategoryId = new FieldData(28, "ParentCategoryId", (v, p) => p.ParentCategoryId = v);
             var parentCategoryName = new FieldData(29, "ParentCategoryName", (v, p) => p.ParentCategoryName = v);
@@ -79,12 +81,17 @@ namespace ConverserLibrary
                 { Field.BitrixCode, bitrixCode },
                 { Field.Quantity, quantity },
                 { Field.Description, description },
-                { Field.JapaneseCuisineStation, japaneseCuisineStation },
-                { Field.PanasianCuisineStation, panasianCuisineStation },
+                //{ Field.JapaneseCuisineStation, japaneseCuisineStation },
+                //{ Field.PanasianCuisineStation, panasianCuisineStation },
                 { Field.CategoryName, categoryName },
                 { Field.ParentCategoryId, parentCategoryId },
                 { Field.ParentCategoryName, parentCategoryName },
             };
+        }
+
+        private int GetColumnNumber(string a)
+        {
+            return 0;
         }
 
         /// <summary>
@@ -115,19 +122,19 @@ namespace ConverserLibrary
         /// </summary>
         /// <param name="value">Значение из ячейки Excel</param>
         /// <returns></returns>
-        private int? GetIntValue(string value)
-        {
-            if (int.TryParse(value, out int intValue))
-            {
-                return intValue;
-            }
-            else
-            {
-                _logger.LogError("Ошибка при преобразовании значения '{value}' в int", value);
-            }
+        //private int? GetIntValue(string value)
+        //{
+        //    if (int.TryParse(value, out int intValue))
+        //    {
+        //        return intValue;
+        //    }
+        //    else
+        //    {
+        //        _logger.LogError("Ошибка при преобразовании значения '{value}' в int", value);
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         /// <summary>
         /// Получает данные из файла Excel и возвращает список продуктов.

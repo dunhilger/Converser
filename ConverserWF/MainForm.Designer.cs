@@ -42,7 +42,7 @@
             FileSizeLabel = new Label();
             DataLoadProgressBar = new ProgressBar();
             CategoryTreePanel = new TreeView();
-            CheckAll = new CheckBox();
+            CheckAllBoxes = new CheckBox();
             FeedCreatorProgressBar = new ProgressBar();
             panel4 = new Panel();
             panel8 = new Panel();
@@ -233,17 +233,17 @@
             CategoryTreePanel.TabIndex = 17;
             CategoryTreePanel.AfterCheck += CategoryTree_AfterCheck;
             // 
-            // CheckAll
+            // CheckAllBoxes
             // 
-            CheckAll.AutoSize = true;
-            CheckAll.ForeColor = Color.Black;
-            CheckAll.Location = new Point(25, 23);
-            CheckAll.Name = "CheckAll";
-            CheckAll.Size = new Size(130, 27);
-            CheckAll.TabIndex = 3;
-            CheckAll.Text = "Выбрать все";
-            CheckAll.UseVisualStyleBackColor = true;
-            CheckAll.Click += CheckAll_Click;
+            CheckAllBoxes.AutoSize = true;
+            CheckAllBoxes.ForeColor = Color.Black;
+            CheckAllBoxes.Location = new Point(25, 23);
+            CheckAllBoxes.Name = "CheckAllBoxes";
+            CheckAllBoxes.Size = new Size(130, 27);
+            CheckAllBoxes.TabIndex = 3;
+            CheckAllBoxes.Text = "Выбрать все";
+            CheckAllBoxes.UseVisualStyleBackColor = true;
+            CheckAllBoxes.Click += CheckAll_Click;
             // 
             // FeedCreatorProgressBar
             // 
@@ -314,7 +314,7 @@
             panel9.BackColor = Color.Transparent;
             panel9.Controls.Add(CategoryTreePanel);
             panel9.Controls.Add(panel10);
-            panel9.Controls.Add(CheckAll);
+            panel9.Controls.Add(CheckAllBoxes);
             panel9.Controls.Add(panel11);
             panel9.Controls.Add(panel12);
             panel9.Controls.Add(panel13);
@@ -563,7 +563,7 @@
         private TextBox BrowseDirectoryExportField;
         private Button ResetButton;
         private Button DataLoadButton;
-        private CheckBox CheckAll;
+        private CheckBox CheckAllBoxes;
         private ProgressBar DataLoadProgressBar;
         private ProgressBar FeedCreatorProgressBar;
         private TreeView CategoryTreePanel;

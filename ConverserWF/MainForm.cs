@@ -42,6 +42,7 @@ namespace ConverserWF
         /// <param name="separator">Интерфейс сервиса сепаратора</param>
         /// <param name="yandexFeedCreatorService">Интерфейс сервиса для создания XML-фидов Яндекс</param>
         /// <param name="twoGisFeedCreatorService">Интерфейс сервиса для создания XML-фидов 2ГИС</param>
+        /// <param name="vkFeedCreatorService">Интерфейс сервиса для создания XML-фидов Вконтакте</param>
         public MainForm(ILogger<MainForm> logger,
             IExcelParserService parser,
             ICitySeparatorService separator,
@@ -51,7 +52,7 @@ namespace ConverserWF
         {
             InitializeComponent();
             InitializeTooltips();
-            SetEnableStateRadioButton(false);
+            UpdateRadioButtonState();
             _logger = logger;
             _parser = parser;
             _separator = separator;
@@ -62,7 +63,8 @@ namespace ConverserWF
             RadioButtonActions.Add(RadioButton2gis, () => HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml));
             RadioButtonActions.Add(RadioButtonVK, () => HandleFeedButtonClick(_vkFeedCreatorService.CreateXml));
             DataLoadButton.Enabled = false;
-            CheckAll.Enabled = false;
+            CheckAllBoxes.Enabled = false;
+            ExportButton.Enabled = false;
         }
 
         private void OnXmlCreated(object sender, XmlCreatedEventArgs e)
@@ -98,9 +100,10 @@ namespace ConverserWF
         /// <param name="e">Аргументы события Click.</param>
         private void ExportButton_Click(object sender, EventArgs e)
         {
-            if (_selectedRadioButton != null && RadioButtonActions
+            if (_selectedRadioButton is not null && RadioButtonActions
                 .TryGetValue(_selectedRadioButton, out Action value))
             {
+                //ExportButton.Enabled = true;
                 value.Invoke();
             }
             else
@@ -192,18 +195,18 @@ namespace ConverserWF
             CategoryTreePanel.Nodes.Clear();
             CategoryTreePanel.CheckBoxes = true;
 
-            CheckAll.Enabled = true;
-            CheckAll.Checked = false;
-
-            var products = _parser.GetXLSXFile(_filePathImport);
-            _cityDictionary = _separator.SeparateByCity(products);
-
-            DataLoadProgressBar.Visible = true;
-            DataLoadProgressBar.Maximum = _cityDictionary.Categories
-                .Count(c => string.IsNullOrEmpty(c.ParentID));
+            CheckAllBoxes.Enabled = true;
+            CheckAllBoxes.Checked = false;
 
             if (IsVlidExcelFile(_filePathImport))
             {
+                var products = _parser.GetXLSXFile(_filePathImport);
+                _cityDictionary = _separator.SeparateByCity(products);
+
+                DataLoadProgressBar.Visible = true;
+                DataLoadProgressBar.Maximum = _cityDictionary.Categories
+                    .Count(c => string.IsNullOrEmpty(c.ParentID));
+
                 foreach (var category in _cityDictionary.Categories.Where(c => c.ParentID == null))
                 {
                     var rootNode = new TreeNode($"{category.Value} [{category.ID}]")
@@ -223,7 +226,7 @@ namespace ConverserWF
                 FileSizeLabel.Text = $"Размер файла: {GetFormatFileSize(_filePathImport)}";
                 CategoryTreePanel.ExpandAll();
                 DataLoadButton.Enabled = false;
-                CheckAll.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
+                CheckAllBoxes.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
             }
             else
             {
@@ -301,7 +304,7 @@ namespace ConverserWF
                     e.Node.Parent.Checked = e.Node.Parent.Nodes.Cast<TreeNode>().Any(node => node.Checked);
                 }
 
-                UpdateRadioButtonEnableState();
+                UpdateRadioButtonState();
             }
         }
 
@@ -319,7 +322,7 @@ namespace ConverserWF
                 SetCheckChildNode(node, selectAll);
             }
 
-            UpdateRadioButtonEnableState();
+            UpdateRadioButtonState();
         }
 
         /// <summary>
@@ -348,9 +351,18 @@ namespace ConverserWF
 
             if (files.Length > 0)
             {
-                _filePathImport = files[0];
+                string path = null;
 
-                if (IsExcelFile(_filePathImport))
+                foreach (var file in files)
+                {
+                    if (IsExcelFile(file))
+                    {
+                        path = file;
+                        break;
+                    }
+                }
+
+                if (path != null)
                 {
                     e.Effect = DragDropEffects.Copy;
                     Cursor = Cursors.Default;
@@ -360,6 +372,11 @@ namespace ConverserWF
                     e.Effect = DragDropEffects.None;
                     Cursor = Cursors.Cross;
                 }
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+                Cursor = Cursors.Cross;
             }
         }
 
@@ -371,21 +388,34 @@ namespace ConverserWF
         private void OnDragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            string path = null;
+
             if (files.Length > 0)
             {
-                _filePathImport = files[0];
-
-                if (string.IsNullOrEmpty(_filePathExport))
+                foreach (var file in files)
                 {
-                    _filePathExport = _filePathImport;
-                    BrowseDirectoryExportField.Text = Path.GetDirectoryName(_filePathImport);
+                    if (IsExcelFile(file))
+                    {
+                        path = file;
+                        break;
+                    }
+                }
+            }
+
+            if (path is not null && path != _filePathImport)
+            {
+                if (_filePathImport is not null)
+                {
+                    ClearUIState();
                 }
 
-                ClearUIState();
-
-                ProcessFile(_filePathImport);
+                _filePathImport = path;
+                _filePathExport = Path.GetDirectoryName(_filePathImport);
 
                 BrowseDirectoryImportField.Text = _filePathImport;
+                BrowseDirectoryExportField.Text = _filePathExport;
+                ProcessFile(_filePathImport);
             }
         }
 
@@ -405,17 +435,18 @@ namespace ConverserWF
 
                 if (dialogResult == DialogResult.OK)
                 {
-                    _filePathImport = openFileDialog.FileName;
-
-                    ClearUIState();
-
-                    if (string.IsNullOrEmpty(_filePathExport) || _filePathExport != _filePathImport)
+                    if(_filePathImport != openFileDialog.FileName)
                     {
-                        _filePathExport = _filePathImport;
-                        BrowseDirectoryExportField.Text = Path.GetDirectoryName(_filePathImport);
-                    }
+                        if (!string.IsNullOrEmpty(_filePathImport))
+                        {
+                            ClearUIState();
+                        }
 
-                    ProcessFile(_filePathImport);
+                        _filePathImport = openFileDialog.FileName;                     
+                        _filePathExport = Path.GetDirectoryName(_filePathImport);
+                        BrowseDirectoryExportField.Text = _filePathExport;
+                        ProcessFile(_filePathImport);
+                    }  
 
                     BrowseDirectoryImportField.Text = _filePathImport;
                 }
@@ -488,37 +519,39 @@ namespace ConverserWF
         private void ClearUIState()
         {
             DataLoadButton.Text = "Загрузить данные"; 
-            CheckAll.Checked = false; 
-            CheckAll.Enabled = false; 
-            CheckAll.Text = "Выбрать все"; 
+            CheckAllBoxes.Checked = false; 
+            CheckAllBoxes.Enabled = false; 
+            CheckAllBoxes.Text = "Выбрать все"; 
             CategoryTreePanel.Nodes.Clear(); 
             DataLoadProgressBar.Visible = false; 
             DataLoadProgressBar.Value = 0; 
             FeedCreatorProgressBar.Value = 0; 
             FileSizeLabel.Text = "";
-            SetEnableStateRadioButton(false);
-        }
-
-        /// <summary>
-        /// Устанавливает для каждой RadioButton состояние активности/неактивности.
-        /// </summary>
-        private void SetEnableStateRadioButton(bool enableStatus)
-        {
-            foreach (RadioButton radioButton in RadioButtonPanel.Controls.OfType<RadioButton>())
-            {
-                radioButton.Enabled = enableStatus;
-                radioButton.Checked = enableStatus; // многократно вызывает RadioButton_CheckedChanged 
-            }
+            UpdateRadioButtonState();
         }
 
         /// <summary>
         /// Обновляет состояние активности RadioButton в зависимости от того, 
         /// выбран ли хотя бы один узел категории.
         /// </summary>
-        private void UpdateRadioButtonEnableState()
+        private void UpdateRadioButtonState()
         {
-            bool anyCategorySelected = GetAllCheckedNodes(CategoryTreePanel.Nodes).Any();
-            SetEnableStateRadioButton(anyCategorySelected);
+            bool anyChecked = GetAllCheckedNodes(CategoryTreePanel.Nodes).Any(node => node.Checked);
+
+            foreach (RadioButton radioButton in RadioButtonPanel.Controls.OfType<RadioButton>())
+            {
+                radioButton.Enabled = anyChecked;
+                radioButton.Checked = anyChecked && radioButton.Checked;
+            }
+
+            if (_selectedRadioButton is not null)
+            {
+                ExportButton.Enabled = true;
+            }
+            else
+            {
+                ExportButton.Enabled= false;
+            }
         }
 
         /// <summary>
@@ -539,23 +572,38 @@ namespace ConverserWF
         /// <returns></returns>
         private static bool IsVlidExcelFile(string filePath)
         {
+            // TODO: Проверять что есть все нужные столбцы без 
+            // привязки к их расположению.
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var expectedColumnTitles = new List<string> 
+            {
+                "КартинкаКрупная",
+                "Название_блюда",
+                "НаименованиеСайт",
+                "Цена",
+                "Название_блюда_в_МП",
+                "Описание",
+                "ВесГраммы",
+                "ПорцияКоличество",
+                "БитриксКод",
+                "ИдКатегория",
+                "ИдКатегорияРодитель",
+                "НаименованиеРодитель"
+            };
+
             using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
                 var worksheet = package.Workbook.Worksheets[0];
 
-                if (worksheet == null ||
-                    worksheet.Cells["A1"].Text != "Город" ||
-                    worksheet.Cells["C1"].Text != "КартинкаКрупная" ||
-                    worksheet.Cells["D1"].Text != "Название_блюда" ||
-                    worksheet.Cells["G1"].Text != "ИдМпМенюКатегория" ||
-                    worksheet.Cells["I1"].Text != "Описание" ||
-                    worksheet.Cells["M1"].Text != "ВесГраммы" ||
-                    worksheet.Cells["AA1"].Text != "ИдКатегория")
+                var columnTitles = new List<string>();
+
+                for (int i = 1; i < worksheet.Dimension.Columns; i++)
                 {
-                    return false;
+                    columnTitles.Add(worksheet.Cells[1, i].Text.Trim());
                 }
 
-                else return true;
+                return expectedColumnTitles.All(title => columnTitles.Contains(title, StringComparer.OrdinalIgnoreCase)); 
             }
         }
     }
