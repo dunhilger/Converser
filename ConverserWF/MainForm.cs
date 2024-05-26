@@ -4,6 +4,9 @@ using ConverserLibrary.Interfaces;
 using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using static System.Net.WebRequestMethods;
 
 namespace ConverserWF
 {
@@ -64,7 +67,7 @@ namespace ConverserWF
             RadioButtonActions.Add(RadioButtonVK, () => HandleFeedButtonClick(_vkFeedCreatorService.CreateXml));
             DataLoadButton.Enabled = false;
             CheckAllBoxes.Enabled = false;
-            ExportButton.Enabled = false;
+            ExportButton.Enabled = true;
         }
 
         private void OnXmlCreated(object sender, XmlCreatedEventArgs e)
@@ -93,24 +96,44 @@ namespace ConverserWF
             }
         }
 
+        class CatModel
+        {
+            [JsonPropertyName("fact")]
+            public string Fact { get; set; }
+
+            [JsonPropertyName("length")]
+            public int Length { get; set; }
+        }
+
         /// <summary>
         /// Обоработчик события Click для кнопки экспорта.
         /// </summary>
         /// <param name="sender">Объект, вызвавший событие.</param>
         /// <param name="e">Аргументы события Click.</param>
-        private void ExportButton_Click(object sender, EventArgs e)
+        private async void ExportButton_Click(object sender, EventArgs e)
         {
-            if (_selectedRadioButton is not null && RadioButtonActions
-                .TryGetValue(_selectedRadioButton, out Action value))
+            using (var client = new HttpClient())
             {
-                //ExportButton.Enabled = true;
-                value.Invoke();
+                var response = await client.GetAsync("https://catfact.ninja/fact");
+
+                var content = await response.Content.ReadAsStringAsync();
+
+                var model = JsonSerializer.Deserialize<CatModel>(content);
+
+                MessageBox.Show(model.Fact);
             }
-            else
-            {
-                MessageBox.Show(this, "Не выбран целевой сервис для создания фидов.", "Внимание",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+
+            //if (_selectedRadioButton is not null && RadioButtonActions
+            //    .TryGetValue(_selectedRadioButton, out Action value))
+            //{
+            //    //ExportButton.Enabled = true;
+            //    value.Invoke();
+            //}
+            //else
+            //{
+            //    MessageBox.Show(this, "Не выбран целевой сервис для создания фидов.", "Внимание",
+            //                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //}
         }
 
         /// <summary>
@@ -192,14 +215,18 @@ namespace ConverserWF
         /// <param name="e">Аргументы события Click.</param>
         private void DataLoadButton_Click(object sender, EventArgs e)
         {
-            CategoryTreePanel.Nodes.Clear();
-            CategoryTreePanel.CheckBoxes = true;
-
-            CheckAllBoxes.Enabled = true;
-            CheckAllBoxes.Checked = false;
-
-            if (IsVlidExcelFile(_filePathImport))
+            try
             {
+                CategoryTreePanel.Nodes.Clear();
+                CategoryTreePanel.CheckBoxes = true;
+
+                CheckAllBoxes.Enabled = true;
+                CheckAllBoxes.Checked = false;
+
+                // TODO: Перенести проверку валидности формата 
+                // содержимого файла внутрь парсера. Если формат не 
+                // соответствует, то вернуть null.
+
                 var products = _parser.GetXLSXFile(_filePathImport);
                 _cityDictionary = _separator.SeparateByCity(products);
 
@@ -228,9 +255,10 @@ namespace ConverserWF
                 DataLoadButton.Enabled = false;
                 CheckAllBoxes.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
             }
-            else
+            catch (InvalidOperationException ex)
             {
-                MessageBox.Show(this, "Выбранный файл Excel не подходит для создания фидов.", "Внимание",
+
+                MessageBox.Show(this, ex.Message, "Внимание",
                             MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ResetButton_Click(this, new EventArgs());
             }
@@ -315,11 +343,11 @@ namespace ConverserWF
         /// <param name="e">Аргументы события CheckAll_Click.</param>
         private void CheckAll_Click(object sender, EventArgs e)
         {
-            bool selectAll = !CategoryTreePanel.Nodes.Cast<TreeNode>().All(node => node.Checked);
+            var isChecked = CheckAllBoxes.Checked;
 
             foreach (TreeNode node in CategoryTreePanel.Nodes)
             {
-                SetCheckChildNode(node, selectAll);
+                SetCheckChildNode(node, isChecked);
             }
 
             UpdateRadioButtonState();
@@ -550,7 +578,7 @@ namespace ConverserWF
             }
             else
             {
-                ExportButton.Enabled= false;
+                ExportButton.Enabled = false;
             }
         }
 
@@ -563,48 +591,6 @@ namespace ConverserWF
         {
             return Path.GetExtension(filePath).Equals(".xlsx", StringComparison.OrdinalIgnoreCase)
                 || Path.GetExtension(filePath).Equals(".xls", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Проверка совместимости файла Excel с возможностью создания фидов
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        private static bool IsVlidExcelFile(string filePath)
-        {
-            // TODO: Проверять что есть все нужные столбцы без 
-            // привязки к их расположению.
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            var expectedColumnTitles = new List<string> 
-            {
-                "КартинкаКрупная",
-                "Название_блюда",
-                "НаименованиеСайт",
-                "Цена",
-                "Название_блюда_в_МП",
-                "Описание",
-                "ВесГраммы",
-                "ПорцияКоличество",
-                "БитриксКод",
-                "ИдКатегория",
-                "ИдКатегорияРодитель",
-                "НаименованиеРодитель"
-            };
-
-            using (var package = new ExcelPackage(new FileInfo(filePath)))
-            {
-                var worksheet = package.Workbook.Worksheets[0];
-
-                var columnTitles = new List<string>();
-
-                for (int i = 1; i < worksheet.Dimension.Columns; i++)
-                {
-                    columnTitles.Add(worksheet.Cells[1, i].Text.Trim());
-                }
-
-                return expectedColumnTitles.All(title => columnTitles.Contains(title, StringComparer.OrdinalIgnoreCase)); 
-            }
         }
     }
 }

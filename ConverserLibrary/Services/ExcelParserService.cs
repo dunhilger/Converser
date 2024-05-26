@@ -23,9 +23,7 @@ namespace ConverserLibrary
             Weight,
             Quantity,
             Description,
-            //JapaneseCuisineStation,
             BitrixCode,
-            //PanasianCuisineStation,
             CategoryName,
             ParentCategoryId,
             ParentCategoryName,
@@ -53,22 +51,19 @@ namespace ConverserLibrary
             // TODO: Определять в каком номере столбца находится заголовок,
             // запоминать номер и передавать вместо константного значения для 
             // каждой FieldData.
-            var commercialName = new FieldData(5, "CommercialName", (v, p) => p.CommercialName = v);
-            var technicalName = new FieldData(4, "TechnicalName", (v, p) => p.TechnicalName = v);
-            var price = new FieldData(6, "Price", (v, p) => p.Price = GetNumericValue(v));
-            var categoryId = new FieldData(27, "CategoryId", (v, p) => p.CategoryId = v);
-            var pictureLink = new FieldData(3, "PictureLink", (v, p) => p.PictureLink = v);
-            var weight = new FieldData(13, "Weight", (v, p) => p.Weight = GetNumericValue(v));
-            var bitrixCode = new FieldData(20, "BitrixCode", (v, p) => p.BitrixCode = v);
-            var quantity = new FieldData(14, "Quantity", (v, p) => p.Quantity = GetNumericValue(v));
-            var description = new FieldData(9, "Description", (v, p) => p.Description = v);
-            //var japaneseCuisineStation = new FieldData(25, "JapaneseCuisineStation",
-            //    (v, p) => p.JapaneseCuisineStationQuantity = GetIntValue(v));
-            //var panasianCuisineStation = new FieldData(26, "PanasianCuisineStation",
-            //    (v, p) => p.PanasianCuisineStationQuantity = GetIntValue(v));
-            var categoryName = new FieldData(8, "CategoryName", (v, p) => p.CategoryName = v);
-            var parentCategoryId = new FieldData(28, "ParentCategoryId", (v, p) => p.ParentCategoryId = v);
-            var parentCategoryName = new FieldData(29, "ParentCategoryName", (v, p) => p.ParentCategoryName = v);
+
+            var commercialName = new FieldData("НаименованиеСайт", (v, p) => p.CommercialName = v);
+            var technicalName = new FieldData("Название_блюда", (v, p) => p.TechnicalName = v);
+            var price = new FieldData("Цена", (v, p) => p.Price = GetNumericValue(v));
+            var categoryId = new FieldData("ИдКатегория", (v, p) => p.CategoryId = v);
+            var pictureLink = new FieldData("КартинкаКрупная", (v, p) => p.PictureLink = v);
+            var weight = new FieldData("ВесГраммы", (v, p) => p.Weight = GetNumericValue(v));
+            var bitrixCode = new FieldData("БитриксКод", (v, p) => p.BitrixCode = v);
+            var quantity = new FieldData("ПорцияКоличество", (v, p) => p.Quantity = GetNumericValue(v));
+            var description = new FieldData("Описание", (v, p) => p.Description = v);
+            var categoryName = new FieldData("Название_блюда_в_МП", (v, p) => p.CategoryName = v);
+            var parentCategoryId = new FieldData("ИдКатегорияРодитель", (v, p) => p.ParentCategoryId = v);
+            var parentCategoryName = new FieldData("НаименованиеРодитель", (v, p) => p.ParentCategoryName = v);
 
             _fields = new Dictionary<Field, FieldData>()
             {
@@ -81,17 +76,10 @@ namespace ConverserLibrary
                 { Field.BitrixCode, bitrixCode },
                 { Field.Quantity, quantity },
                 { Field.Description, description },
-                //{ Field.JapaneseCuisineStation, japaneseCuisineStation },
-                //{ Field.PanasianCuisineStation, panasianCuisineStation },
                 { Field.CategoryName, categoryName },
                 { Field.ParentCategoryId, parentCategoryId },
                 { Field.ParentCategoryName, parentCategoryName },
             };
-        }
-
-        private int GetColumnNumber(string a)
-        {
-            return 0;
         }
 
         /// <summary>
@@ -118,25 +106,6 @@ namespace ConverserLibrary
         }
 
         /// <summary>
-        /// Преобразует строковое значения в целочисленное int
-        /// </summary>
-        /// <param name="value">Значение из ячейки Excel</param>
-        /// <returns></returns>
-        //private int? GetIntValue(string value)
-        //{
-        //    if (int.TryParse(value, out int intValue))
-        //    {
-        //        return intValue;
-        //    }
-        //    else
-        //    {
-        //        _logger.LogError("Ошибка при преобразовании значения '{value}' в int", value);
-        //    }
-
-        //    return null;
-        //}
-
-        /// <summary>
         /// Получает данные из файла Excel и возвращает список продуктов.
         /// </summary>
         /// <param name="path">Путь к файлу Excel</param>
@@ -150,6 +119,29 @@ namespace ConverserLibrary
             using (var package = new ExcelPackage(new FileInfo(path)))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                var nameDict = _fields
+                    .GroupBy(i => i.Value.Name)
+                    .ToDictionary(i => i.Key, i => i.FirstOrDefault().Value);
+
+                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                {
+                    var columnName = worksheet.Cells[1, col].Text.Trim();
+
+                    if (nameDict.TryGetValue(columnName, out var field))
+                    {
+                        field.Position = col;
+                    }
+                }
+
+                foreach (var field in _fields.Values)
+                {
+                    if (field.Position == 0)
+                    {
+                        throw new InvalidOperationException("Выбранный файл Excel не подходит для создания фидов.");
+                    }
+                }
+
                 int rowCount = worksheet.Cells[worksheet.Dimension.End.Row, 1].End.Row;
 
                 for (int row = 2; row <= rowCount; row++)
@@ -221,12 +213,10 @@ namespace ConverserLibrary
             /// <summary>
             /// Инициализирует экземпляр класса FieldData
             /// </summary>
-            /// <param name="position">Позиция поля в файле Excel</param>
             /// <param name="name">Имя поля</param>
             /// <param name="handler">Метод обработки данных этого поля</param>
-            public FieldData(int position, string name, Action<string, Product> handler)
+            public FieldData(string name, Action<string, Product> handler)
             {
-                Position = position;
                 Name = name;
                 Handler = handler;
             }
@@ -249,7 +239,7 @@ namespace ConverserLibrary
             /// <summary>
             /// Получает позицию поля в файле Excel.
             /// </summary>
-            public int Position { get; }
+            public int Position { get; set; }
 
             /// <summary>
             /// Получает имя поля.

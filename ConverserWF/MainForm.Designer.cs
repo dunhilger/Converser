@@ -537,10 +537,11 @@
             Controls.Add(panel9);
             Font = new Font("Segoe UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
             ForeColor = Color.Transparent;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "MainForm";
             Text = "Converser";
-            WindowState = FormWindowState.Maximized;
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
             panel9.ResumeLayout(false);
