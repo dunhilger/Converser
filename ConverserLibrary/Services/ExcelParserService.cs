@@ -48,9 +48,6 @@ namespace ConverserLibrary
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-            // TODO: Определять в каком номере столбца находится заголовок,
-            // запоминать номер и передавать вместо константного значения для 
-            // каждой FieldData.
 
             var commercialName = new FieldData("НаименованиеСайт", (v, p) => p.CommercialName = v);
             var technicalName = new FieldData("Название_блюда", (v, p) => p.TechnicalName = v);
