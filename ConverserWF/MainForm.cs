@@ -3,7 +3,10 @@ using ConverserLibrary.Dto;
 using ConverserLibrary.Interfaces;
 using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using OfficeOpenXml;
+using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.Net.WebRequestMethods;
@@ -96,13 +99,49 @@ namespace ConverserWF
             }
         }
 
-        class CatModel
+        class DataList
         {
-            [JsonPropertyName("fact")]
-            public string Fact { get; set; }
+            [JsonPropertyName("list")]
+            public List<City> List { get; set; }
+        }
 
-            [JsonPropertyName("length")]
-            public int Length { get; set; }
+        class Root
+        {
+            [JsonPropertyName("data")]
+            public DataList Data { get; set; }
+        }
+
+        class Location
+        {
+            [JsonPropertyName("latitude")]
+            public double Latitude { get; set; }
+
+            [JsonPropertyName("longitude")]
+            public double Longitude { get; set; }
+        }
+
+        class City
+        {
+            [JsonPropertyName("id")]
+            public string Id { get; set; }
+
+            [JsonPropertyName("idMenu")]
+            public string IdMenu { get; set; }
+
+            [JsonPropertyName("title")]
+            public string Title { get; set; }
+
+            [JsonPropertyName("location")]
+            public Location Location { get; set; }
+
+            [JsonPropertyName("timezone")]
+            public int Timezone { get; set; }
+
+            [JsonPropertyName("slug")]
+            public string Slug { get; set; }
+
+            [JsonPropertyName("onlyOnlinePaymentDays")]
+            public object OnlyOnlinePaymentDays { get; set; }
         }
 
         /// <summary>
@@ -112,15 +151,50 @@ namespace ConverserWF
         /// <param name="e">Аргументы события Click.</param>
         private async void ExportButton_Click(object sender, EventArgs e)
         {
+            //using (var client = new HttpClient())
+            //{
+            //    var response = await client.GetAsync("https://catfact.ninja/fact");
+
+            //    var content = await response.Content.ReadAsStringAsync();
+
+            //    var model = JsonSerializer.Deserialize<CatModel>(content);
+
+            //    MessageBox.Show(model.Fact);
+            //}
+
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync("https://catfact.ninja/fact");
+                var response = await client.GetAsync("https://mybile.mybox.ru/api/v1/cities");
 
-                var content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
 
-                var model = JsonSerializer.Deserialize<CatModel>(content);
+                    MessageBox.Show(content, "Response Content", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                MessageBox.Show(model.Fact);
+                    try
+                    {
+                        var root = JsonConvert.DeserializeObject<Root>(content);
+
+                        List<City> cities = root.Data.List;
+
+                        StringBuilder sb = new StringBuilder();
+                        foreach (var city in cities)
+                        {
+                            sb.AppendLine($"Title: {city.Title}, Latitude: {city.Location.Latitude}, Longitude: {city.Location.Longitude}");
+                        }
+
+                        MessageBox.Show(sb.ToString(), "City Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (JsonReaderException ex)
+                    {
+                        MessageBox.Show($"Ошибка при разборе JSON: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Ошибка при получении данных из API", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
 
             //if (_selectedRadioButton is not null && RadioButtonActions

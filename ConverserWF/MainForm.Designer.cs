@@ -48,6 +48,7 @@
             tabControl1 = new TabControl();
             Excel = new TabPage();
             API = new TabPage();
+            textBox1 = new TextBox();
             panel8 = new Panel();
             panel7 = new Panel();
             panel6 = new Panel();
@@ -78,6 +79,7 @@
             panel4.SuspendLayout();
             tabControl1.SuspendLayout();
             Excel.SuspendLayout();
+            API.SuspendLayout();
             panel9.SuspendLayout();
             panel1.SuspendLayout();
             RadioButtonPanel.SuspendLayout();
@@ -187,7 +189,7 @@
             ResetButton.BackColor = Color.LightGray;
             ResetButton.ForeColor = SystemColors.ButtonFace;
             ResetButton.Image = (Image)resources.GetObject("ResetButton.Image");
-            ResetButton.Location = new Point(648, 12);
+            ResetButton.Location = new Point(656, 16);
             ResetButton.Name = "ResetButton";
             ResetButton.Size = new Size(36, 34);
             ResetButton.TabIndex = 12;
@@ -231,9 +233,9 @@
             // 
             CategoryTreePanel.BackColor = SystemColors.MenuBar;
             CategoryTreePanel.FullRowSelect = true;
-            CategoryTreePanel.Location = new Point(25, 56);
+            CategoryTreePanel.Location = new Point(20, 56);
             CategoryTreePanel.Name = "CategoryTreePanel";
-            CategoryTreePanel.Size = new Size(659, 391);
+            CategoryTreePanel.Size = new Size(672, 409);
             CategoryTreePanel.TabIndex = 17;
             CategoryTreePanel.AfterCheck += CategoryTree_AfterCheck;
             // 
@@ -299,6 +301,7 @@
             // 
             // API
             // 
+            API.Controls.Add(textBox1);
             API.Location = new Point(4, 30);
             API.Name = "API";
             API.Padding = new Padding(3);
@@ -306,6 +309,16 @@
             API.TabIndex = 1;
             API.Text = "Api Json";
             API.UseVisualStyleBackColor = true;
+            // 
+            // textBox1
+            // 
+            textBox1.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBox1.ForeColor = Color.DimGray;
+            textBox1.Location = new Point(18, 17);
+            textBox1.Name = "textBox1";
+            textBox1.PlaceholderText = "Введите URL";
+            textBox1.Size = new Size(404, 28);
+            textBox1.TabIndex = 0;
             // 
             // panel8
             // 
@@ -579,6 +592,8 @@
             tabControl1.ResumeLayout(false);
             Excel.ResumeLayout(false);
             Excel.PerformLayout();
+            API.ResumeLayout(false);
+            API.PerformLayout();
             panel9.ResumeLayout(false);
             panel9.PerformLayout();
             panel1.ResumeLayout(false);
@@ -631,5 +646,6 @@
         private TabControl tabControl1;
         private TabPage Excel;
         private TabPage API;
+        private TextBox textBox1;
     }
 }
