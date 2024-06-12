@@ -4,12 +4,8 @@ using ConverserLibrary.Interfaces;
 using ConverserLibrary.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using OfficeOpenXml;
-using System.Net.Http.Json;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using static System.Net.WebRequestMethods;
 
 namespace ConverserWF
 {
@@ -164,7 +160,7 @@ namespace ConverserWF
 
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync("https://mybile.mybox.ru/api/v1/cities");
+                var response = await client.GetAsync("https://mybile-stage.mybox.ru/api/v1/cities");
 
                 if (response.IsSuccessStatusCode)
                 {
