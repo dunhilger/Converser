@@ -28,27 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Label BrowseFileText;
-            Label label2;
-            Label label1;
-            Label label3;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            DirectoryImportButton = new Button();
+            BrowseFileText = new Label();
+            label2 = new Label();
+            label1 = new Label();
+            label3 = new Label();
             DirectoryExportButton = new Button();
-            BrowseDirectoryImportField = new TextBox();
             BrowseDirectoryExportField = new TextBox();
             ResetButton = new Button();
-            DataLoadButton = new Button();
+            LoadButton = new Button();
             FileSizeLabel = new Label();
             DataLoadProgressBar = new ProgressBar();
             CategoryTreePanel = new TreeView();
             CheckAllBoxes = new CheckBox();
             FeedCreatorProgressBar = new ProgressBar();
             panel4 = new Panel();
-            tabControl1 = new TabControl();
+            tabControl = new TabControl();
             Excel = new TabPage();
+            BrowseDirectoryImportField = new TextBox();
+            DirectoryImportButton = new Button();
             API = new TabPage();
-            textBox1 = new TextBox();
+            ApiUrlInput = new TextBox();
             panel8 = new Panel();
             panel7 = new Panel();
             panel6 = new Panel();
@@ -64,6 +64,7 @@
             panel15 = new Panel();
             panel16 = new Panel();
             RadioButtonPanel = new Panel();
+            GetCityAPIDataButton = new Button();
             ExportButton = new Button();
             RadioButtonVK = new RadioButton();
             RadioButton2gis = new RadioButton();
@@ -72,12 +73,8 @@
             panel18 = new Panel();
             panel19 = new Panel();
             panel20 = new Panel();
-            BrowseFileText = new Label();
-            label2 = new Label();
-            label1 = new Label();
-            label3 = new Label();
             panel4.SuspendLayout();
-            tabControl1.SuspendLayout();
+            tabControl.SuspendLayout();
             Excel.SuspendLayout();
             API.SuspendLayout();
             panel9.SuspendLayout();
@@ -88,7 +85,7 @@
             // BrowseFileText
             // 
             BrowseFileText.BackColor = Color.WhiteSmoke;
-            BrowseFileText.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            BrowseFileText.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
             BrowseFileText.ForeColor = Color.SteelBlue;
             BrowseFileText.Location = new Point(57, 10);
             BrowseFileText.Name = "BrowseFileText";
@@ -100,7 +97,7 @@
             // 
             label2.AutoSize = true;
             label2.BackColor = Color.WhiteSmoke;
-            label2.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label2.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
             label2.ForeColor = Color.SteelBlue;
             label2.Location = new Point(57, 174);
             label2.Name = "label2";
@@ -112,7 +109,7 @@
             // 
             label1.AutoSize = true;
             label1.BackColor = Color.WhiteSmoke;
-            label1.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label1.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
             label1.ForeColor = Color.SteelBlue;
             label1.Location = new Point(772, 9);
             label1.Name = "label1";
@@ -124,25 +121,13 @@
             // 
             label3.AutoSize = true;
             label3.BackColor = Color.WhiteSmoke;
-            label3.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label3.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
             label3.ForeColor = Color.SteelBlue;
             label3.Location = new Point(772, 175);
             label3.Name = "label3";
             label3.Size = new Size(160, 21);
             label3.TabIndex = 23;
             label3.Text = "Целевой сервис";
-            // 
-            // DirectoryImportButton
-            // 
-            DirectoryImportButton.BackColor = Color.Transparent;
-            DirectoryImportButton.ForeColor = Color.Black;
-            DirectoryImportButton.Location = new Point(393, 13);
-            DirectoryImportButton.Name = "DirectoryImportButton";
-            DirectoryImportButton.Size = new Size(42, 30);
-            DirectoryImportButton.TabIndex = 6;
-            DirectoryImportButton.Text = "...\r\n";
-            DirectoryImportButton.UseVisualStyleBackColor = true;
-            DirectoryImportButton.Click += BrowseFileImportDirectory_Click;
             // 
             // DirectoryExportButton
             // 
@@ -155,26 +140,10 @@
             DirectoryExportButton.UseVisualStyleBackColor = true;
             DirectoryExportButton.Click += BrowseExportDirectory_Click;
             // 
-            // BrowseDirectoryImportField
-            // 
-            BrowseDirectoryImportField.AllowDrop = true;
-            BrowseDirectoryImportField.BackColor = Color.White;
-            BrowseDirectoryImportField.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            BrowseDirectoryImportField.ForeColor = Color.DimGray;
-            BrowseDirectoryImportField.Location = new Point(6, 14);
-            BrowseDirectoryImportField.Name = "BrowseDirectoryImportField";
-            BrowseDirectoryImportField.PlaceholderText = "Перетащите сюда файл Excel или кликните для выбора файла на компьютере";
-            BrowseDirectoryImportField.ReadOnly = true;
-            BrowseDirectoryImportField.Size = new Size(381, 28);
-            BrowseDirectoryImportField.TabIndex = 8;
-            BrowseDirectoryImportField.Click += BrowseFileImportDirectory_Click;
-            BrowseDirectoryImportField.DragDrop += OnDragDrop;
-            BrowseDirectoryImportField.DragEnter += OnDragEnter;
-            // 
             // BrowseDirectoryExportField
             // 
             BrowseDirectoryExportField.BackColor = Color.White;
-            BrowseDirectoryExportField.Font = new Font("Tahoma", 10.2F);
+            BrowseDirectoryExportField.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
             BrowseDirectoryExportField.ForeColor = Color.DimGray;
             BrowseDirectoryExportField.Location = new Point(20, 29);
             BrowseDirectoryExportField.Name = "BrowseDirectoryExportField";
@@ -188,7 +157,6 @@
             // 
             ResetButton.BackColor = Color.LightGray;
             ResetButton.ForeColor = SystemColors.ButtonFace;
-            ResetButton.Image = (Image)resources.GetObject("ResetButton.Image");
             ResetButton.Location = new Point(656, 16);
             ResetButton.Name = "ResetButton";
             ResetButton.Size = new Size(36, 34);
@@ -196,19 +164,19 @@
             ResetButton.UseVisualStyleBackColor = false;
             ResetButton.Click += ResetButton_Click;
             // 
-            // DataLoadButton
+            // LoadButton
             // 
-            DataLoadButton.AccessibleName = "";
-            DataLoadButton.BackColor = Color.White;
-            DataLoadButton.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            DataLoadButton.ForeColor = Color.Black;
-            DataLoadButton.Location = new Point(482, 59);
-            DataLoadButton.Name = "DataLoadButton";
-            DataLoadButton.Size = new Size(211, 44);
-            DataLoadButton.TabIndex = 13;
-            DataLoadButton.Text = "Загрузить данные";
-            DataLoadButton.UseVisualStyleBackColor = true;
-            DataLoadButton.Click += DataLoadButton_Click;
+            LoadButton.AccessibleName = "";
+            LoadButton.BackColor = Color.White;
+            LoadButton.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            LoadButton.ForeColor = Color.Black;
+            LoadButton.Location = new Point(482, 59);
+            LoadButton.Name = "LoadButton";
+            LoadButton.Size = new Size(211, 44);
+            LoadButton.TabIndex = 13;
+            LoadButton.Text = "Загрузить данные";
+            LoadButton.UseVisualStyleBackColor = true;
+            LoadButton.Click += LoadButton_Click;
             // 
             // FileSizeLabel
             // 
@@ -262,30 +230,30 @@
             // panel4
             // 
             panel4.BackColor = Color.Transparent;
-            panel4.Controls.Add(tabControl1);
+            panel4.Controls.Add(tabControl);
             panel4.Controls.Add(panel8);
             panel4.Controls.Add(panel7);
             panel4.Controls.Add(FileSizeLabel);
             panel4.Controls.Add(DataLoadProgressBar);
             panel4.Controls.Add(panel6);
             panel4.Controls.Add(panel5);
-            panel4.Controls.Add(DataLoadButton);
+            panel4.Controls.Add(LoadButton);
             panel4.ForeColor = Color.WhiteSmoke;
             panel4.Location = new Point(36, 21);
             panel4.Name = "panel4";
             panel4.Size = new Size(710, 147);
             panel4.TabIndex = 18;
             // 
-            // tabControl1
+            // tabControl
             // 
-            tabControl1.Controls.Add(Excel);
-            tabControl1.Controls.Add(API);
-            tabControl1.Font = new Font("Century Gothic", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            tabControl1.Location = new Point(21, 28);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(449, 93);
-            tabControl1.TabIndex = 18;
+            tabControl.Controls.Add(Excel);
+            tabControl.Controls.Add(API);
+            tabControl.Font = new Font("Century Gothic", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            tabControl.Location = new Point(21, 28);
+            tabControl.Name = "tabControl";
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(449, 93);
+            tabControl.TabIndex = 18;
             // 
             // Excel
             // 
@@ -299,9 +267,37 @@
             Excel.Text = "Excel";
             Excel.UseVisualStyleBackColor = true;
             // 
+            // BrowseDirectoryImportField
+            // 
+            BrowseDirectoryImportField.AllowDrop = true;
+            BrowseDirectoryImportField.BackColor = Color.White;
+            BrowseDirectoryImportField.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            BrowseDirectoryImportField.ForeColor = Color.DimGray;
+            BrowseDirectoryImportField.Location = new Point(6, 14);
+            BrowseDirectoryImportField.Name = "BrowseDirectoryImportField";
+            BrowseDirectoryImportField.PlaceholderText = "Перетащите сюда файл Excel или кликните для выбора файла на компьютере";
+            BrowseDirectoryImportField.ReadOnly = true;
+            BrowseDirectoryImportField.Size = new Size(381, 28);
+            BrowseDirectoryImportField.TabIndex = 8;
+            BrowseDirectoryImportField.Click += BrowseFileImportDirectory_Click;
+            BrowseDirectoryImportField.DragDrop += OnDragDrop;
+            BrowseDirectoryImportField.DragEnter += OnDragEnter;
+            // 
+            // DirectoryImportButton
+            // 
+            DirectoryImportButton.BackColor = Color.Transparent;
+            DirectoryImportButton.ForeColor = Color.Black;
+            DirectoryImportButton.Location = new Point(393, 13);
+            DirectoryImportButton.Name = "DirectoryImportButton";
+            DirectoryImportButton.Size = new Size(42, 30);
+            DirectoryImportButton.TabIndex = 6;
+            DirectoryImportButton.Text = "...\r\n";
+            DirectoryImportButton.UseVisualStyleBackColor = true;
+            DirectoryImportButton.Click += BrowseFileImportDirectory_Click;
+            // 
             // API
             // 
-            API.Controls.Add(textBox1);
+            API.Controls.Add(ApiUrlInput);
             API.Location = new Point(4, 30);
             API.Name = "API";
             API.Padding = new Padding(3);
@@ -310,15 +306,16 @@
             API.Text = "Api Json";
             API.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // ApiUrlInput
             // 
-            textBox1.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            textBox1.ForeColor = Color.DimGray;
-            textBox1.Location = new Point(18, 17);
-            textBox1.Name = "textBox1";
-            textBox1.PlaceholderText = "Введите URL";
-            textBox1.Size = new Size(404, 28);
-            textBox1.TabIndex = 0;
+            ApiUrlInput.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            ApiUrlInput.ForeColor = Color.DimGray;
+            ApiUrlInput.Location = new Point(18, 17);
+            ApiUrlInput.Name = "ApiUrlInput";
+            ApiUrlInput.PlaceholderText = "Введите URL";
+            ApiUrlInput.Size = new Size(404, 28);
+            ApiUrlInput.TabIndex = 0;
+            ApiUrlInput.TextChanged += SwitchLoadButtonState;
             // 
             // panel8
             // 
@@ -462,6 +459,7 @@
             // RadioButtonPanel
             // 
             RadioButtonPanel.BackColor = Color.Transparent;
+            RadioButtonPanel.Controls.Add(GetCityAPIDataButton);
             RadioButtonPanel.Controls.Add(ExportButton);
             RadioButtonPanel.Controls.Add(RadioButtonVK);
             RadioButtonPanel.Controls.Add(RadioButton2gis);
@@ -476,6 +474,17 @@
             RadioButtonPanel.Name = "RadioButtonPanel";
             RadioButtonPanel.Size = new Size(685, 234);
             RadioButtonPanel.TabIndex = 24;
+            // 
+            // GetCityAPIDataButton
+            // 
+            GetCityAPIDataButton.ForeColor = Color.Black;
+            GetCityAPIDataButton.Location = new Point(458, 98);
+            GetCityAPIDataButton.Name = "GetCityAPIDataButton";
+            GetCityAPIDataButton.Size = new Size(211, 44);
+            GetCityAPIDataButton.TabIndex = 21;
+            GetCityAPIDataButton.Text = "Данные по городам";
+            GetCityAPIDataButton.UseVisualStyleBackColor = true;
+            GetCityAPIDataButton.Click += GetApiCitiesData;
             // 
             // ExportButton
             // 
@@ -580,7 +589,7 @@
             Controls.Add(BrowseFileText);
             Controls.Add(panel4);
             Controls.Add(panel9);
-            Font = new Font("Segoe UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            Font = new Font("Segoe UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
             ForeColor = Color.Transparent;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -589,7 +598,7 @@
             Text = "Converser";
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            tabControl1.ResumeLayout(false);
+            tabControl.ResumeLayout(false);
             Excel.ResumeLayout(false);
             Excel.PerformLayout();
             API.ResumeLayout(false);
@@ -607,13 +616,11 @@
         #endregion
 
         private Label DragDropElement;
-        private Button DirectoryImportButton;
         private Button DirectoryExportButton;
-        private TextBox BrowseDirectoryImportField;
         private Label BrowseFileText;
         private TextBox BrowseDirectoryExportField;
         private Button ResetButton;
-        private Button DataLoadButton;
+        private Button LoadButton;
         private CheckBox CheckAllBoxes;
         private ProgressBar DataLoadProgressBar;
         private ProgressBar FeedCreatorProgressBar;
@@ -643,9 +650,15 @@
         private RadioButton RadioButton2gis;
         private RadioButton RadioButtonYandex;
         private Button ExportButton;
-        private TabControl tabControl1;
+        private Label label2;
+        private Label label1;
+        private Label label3;
+        private Button GetCityAPIDataButton;
+        private TabControl tabControl;
         private TabPage Excel;
+        private TextBox BrowseDirectoryImportField;
+        private Button DirectoryImportButton;
         private TabPage API;
-        private TextBox textBox1;
+        private TextBox ApiUrlInput;
     }
 }

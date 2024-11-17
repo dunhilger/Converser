@@ -62,16 +62,13 @@ namespace ConverserLibrary.Services
                 var pickup = new XmlAttributes { XmlIgnore = true };
                 overrides.Add(typeof(Offer), "Pickup", pickup);
 
-                var vendor = new XmlAttributes { XmlIgnore = true };
-                overrides.Add(typeof(Offer), "Vendor", vendor);
+                var manufacturerWarranty = new XmlAttributes { XmlIgnore = true };
+                overrides.Add(typeof(Offer), "ManufacturerWarranty", manufacturerWarranty);
 
-                var warranty = new XmlAttributes { XmlIgnore = true };
-                overrides.Add(typeof(Offer), "ManufacturerWarranty", warranty);
+                var countryOfOrigin = new XmlAttributes { XmlIgnore = true };
+                overrides.Add(typeof(Offer), "CountryOfOrigin", countryOfOrigin);
 
-                var country = new XmlAttributes { XmlIgnore = true };
-                overrides.Add(typeof(Offer), "CountryOfOrigin", country);
-
-                var serializer = new XmlSerializer(typeof(Catalog), overrides);
+                var serializer = new XmlSerializer(typeof(Catalog));
                 var filePath = Path.Combine(directoryPath, $"{city.TransliterationCityName}.xml");
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -150,13 +147,13 @@ namespace ConverserLibrary.Services
 
             descriptionBuilder.AppendLine(product.Description);
             //descriptionBuilder.AppendLine("");
-            descriptionBuilder.AppendLine("<br/>");
+            //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine($"{product.Quantity} шт / {product.Weight} г");
             //descriptionBuilder.AppendLine("");
-            descriptionBuilder.AppendLine("<br/>");
+            //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine("Цена может отличаться в зависимости от твоего города.");
             //descriptionBuilder.AppendLine("");
-            descriptionBuilder.AppendLine("<br/>");
+            //descriptionBuilder.AppendLine("<br/>");
             descriptionBuilder.AppendLine("Точную цену можно уточнить на сайте.");
 
             var matchingUtmLabel = utmLabels.FirstOrDefault(label => label.CategoryId == product.CategoryId);

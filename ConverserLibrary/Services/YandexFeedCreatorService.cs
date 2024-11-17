@@ -21,7 +21,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
     /// <exception cref="ArgumentNullException"></exception>
     public YandexFeedCreatorService(
         ILogger<YandexFeedCreatorService> logger,
-        IInfoDataService infoDataService, 
+        IInfoDataService infoDataService,
         ITransliterationService transliterationService)
     {
         _logger = logger ??
@@ -46,7 +46,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
 
         foreach (var city in jsonCities)
         {
-            if (!citySeparatorResult.CityProducts.ContainsKey(city.CityName))  
+            if (!citySeparatorResult.CityProducts.ContainsKey(city.CityName))
             {
                 _logger.LogError("Город '{cityName}' не найден в Excel.", city.CityName);
                 continue;
@@ -62,7 +62,7 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
             nameSpace.Add("", "");
 
             var serializer = new XmlSerializer(typeof(Catalog));
-            var filePath = Path.Combine(directoryPath, $"{_transliterationService.Transliterate(city.CityName)}.xml"); 
+            var filePath = Path.Combine(directoryPath, $"{_transliterationService.Transliterate(city.CityName)}.xml");
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
@@ -117,14 +117,15 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
                 {
                     ID = product.BitrixCode,
                     Model = product.CommercialName,
-                    Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}", 
+                    /*Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}/?utm_source=search&utm_medium=free&utm_campaign=yandex_feed_free",*/ // вернуть этот вариант после правок битрикс
+                    Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{product.BitrixCode}/?utm_source=search&utm_medium=free&utm_campaign=yandex_feed_free",   // временно заменил ЧПУ в ссылках на битрикс код
                     Price = product.Price,
                     CurrencyId = product.Currency,
                     CategoryId = product.CategoryId,
                     Picture = product.PictureLink,
                     Params = new List<Param>()
                     {
-                        new Param() { Name = "Вес", Unit ="Грамм", Value = product.Weight },
+                        new Param() { Name = "Вес", Unit = "Грамм", Value = product.Weight },
                         new Param() { Name = "Количество", Unit = "Штук", Value = product.Quantity }
                     },
                     Description = product.Description,

@@ -110,7 +110,8 @@ namespace ConverserLibrary.Services
                     {
                         ID = product.BitrixCode,
                         Model = product.CommercialName,
-                        Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}/?utm_source=2gis&utm_medium=app&utm_campaign=2gis_feed",
+                        //Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}/?utm_source=2gis&utm_medium=paid&utm_campaign=2gis_menu_product+feed", // вернуть этот вариант после правок битрикс
+                        Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{product.BitrixCode}/?utm_source=2gis&utm_medium=paid&utm_campaign=2gis_menu_product+feed",   // временно заменил ЧПУ в ссылках на битрикс код
                         Price = product.Price,
                         CurrencyId = product.Currency,
                         CategoryId = product.CategoryId,

@@ -27,6 +27,7 @@ namespace ConverserWF
                 .AddSingleton<IVKFeedCreatorService, VKFeedCreatorService>()
                 .AddSingleton<IInfoDataService, InfoDataService>()
                 .AddSingleton<ITransliterationService, TransliterationService>()
+                .AddSingleton<IJsonApiDataService, JsonApiDataService>()
                 .AddSingleton<MainForm>()
                 .BuildServiceProvider();
 

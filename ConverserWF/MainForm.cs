@@ -2,10 +2,9 @@
 using ConverserLibrary.Dto;
 using ConverserLibrary.Interfaces;
 using ConverserLibrary.Models;
+using ConverserLibrary.Models.JSON_Models;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace ConverserWF
 {
@@ -13,6 +12,7 @@ namespace ConverserWF
     {
         private readonly ILogger<MainForm> _logger;
         private readonly IExcelParserService _parser;
+        private readonly IJsonApiDataService _jsonApiDataService;
         private readonly ICitySeparatorService _separator;
         private readonly IYandexFeedCreatorService _yandexFeedCreatorService;
         private readonly ITwoGisFeedCreatorService _twoGisFeedCreatorService;
@@ -27,14 +27,14 @@ namespace ConverserWF
             {
                 ToolTipTitle = "Подсказка"
             };
-            toolTip.SetToolTip(DataLoadButton, "Загрузить данные из файла");
+            toolTip.SetToolTip(LoadButton, "Загрузить данные из файла");
             toolTip.SetToolTip(ResetButton, "Сбросить данные");
         }
 
         /// <summary>
         /// Словарь, содержащий ключи - кнопки radioButton, и значения - делегаты.
         /// </summary>
-        private readonly Dictionary<RadioButton, Action> RadioButtonActions = [];
+        private readonly Dictionary<RadioButton, Action> RadioButtonActions = new Dictionary<RadioButton, Action>();
 
         /// <summary>
         /// Инициализирует экземпляр класса MainService.
@@ -47,6 +47,7 @@ namespace ConverserWF
         /// <param name="vkFeedCreatorService">Интерфейс сервиса для создания XML-фидов Вконтакте</param>
         public MainForm(ILogger<MainForm> logger,
             IExcelParserService parser,
+            IJsonApiDataService jsonApiDataService,
             ICitySeparatorService separator,
             IYandexFeedCreatorService yandexFeedCreatorService,
             ITwoGisFeedCreatorService twoGisFeedCreatorService,
@@ -57,6 +58,7 @@ namespace ConverserWF
             UpdateRadioButtonState();
             _logger = logger;
             _parser = parser;
+            _jsonApiDataService = jsonApiDataService;
             _separator = separator;
             _yandexFeedCreatorService = yandexFeedCreatorService;
             _twoGisFeedCreatorService = twoGisFeedCreatorService;
@@ -64,9 +66,9 @@ namespace ConverserWF
             RadioButtonActions.Add(RadioButtonYandex, () => HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml));
             RadioButtonActions.Add(RadioButton2gis, () => HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml));
             RadioButtonActions.Add(RadioButtonVK, () => HandleFeedButtonClick(_vkFeedCreatorService.CreateXml));
-            DataLoadButton.Enabled = false;
+            LoadButton.Enabled = false;
             CheckAllBoxes.Enabled = false;
-            ExportButton.Enabled = true;
+            ExportButton.Enabled = false;
         }
 
         private void OnXmlCreated(object sender, XmlCreatedEventArgs e)
@@ -92,52 +94,8 @@ namespace ConverserWF
             if (sender is RadioButton radioButton && radioButton.Checked)
             {
                 _selectedRadioButton = radioButton;
+                ExportButton.Enabled = true; // активация кнопки экспорта
             }
-        }
-
-        class DataList
-        {
-            [JsonPropertyName("list")]
-            public List<City> List { get; set; }
-        }
-
-        class Root
-        {
-            [JsonPropertyName("data")]
-            public DataList Data { get; set; }
-        }
-
-        class Location
-        {
-            [JsonPropertyName("latitude")]
-            public double Latitude { get; set; }
-
-            [JsonPropertyName("longitude")]
-            public double Longitude { get; set; }
-        }
-
-        class City
-        {
-            [JsonPropertyName("id")]
-            public string Id { get; set; }
-
-            [JsonPropertyName("idMenu")]
-            public string IdMenu { get; set; }
-
-            [JsonPropertyName("title")]
-            public string Title { get; set; }
-
-            [JsonPropertyName("location")]
-            public Location Location { get; set; }
-
-            [JsonPropertyName("timezone")]
-            public int Timezone { get; set; }
-
-            [JsonPropertyName("slug")]
-            public string Slug { get; set; }
-
-            [JsonPropertyName("onlyOnlinePaymentDays")]
-            public object OnlyOnlinePaymentDays { get; set; }
         }
 
         /// <summary>
@@ -145,65 +103,18 @@ namespace ConverserWF
         /// </summary>
         /// <param name="sender">Объект, вызвавший событие.</param>
         /// <param name="e">Аргументы события Click.</param>
-        private async void ExportButton_Click(object sender, EventArgs e)
+        private void ExportButton_Click(object sender, EventArgs e)
         {
-            //using (var client = new HttpClient())
-            //{
-            //    var response = await client.GetAsync("https://catfact.ninja/fact");
-
-            //    var content = await response.Content.ReadAsStringAsync();
-
-            //    var model = JsonSerializer.Deserialize<CatModel>(content);
-
-            //    MessageBox.Show(model.Fact);
-            //}
-
-            using (var client = new HttpClient())
+            if (_selectedRadioButton is not null && RadioButtonActions
+                .TryGetValue(_selectedRadioButton, out Action value))
             {
-                var response = await client.GetAsync("https://mybile-stage.mybox.ru/api/v1/cities");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    MessageBox.Show(content, "Response Content", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    try
-                    {
-                        var root = JsonConvert.DeserializeObject<Root>(content);
-
-                        List<City> cities = root.Data.List;
-
-                        StringBuilder sb = new StringBuilder();
-                        foreach (var city in cities)
-                        {
-                            sb.AppendLine($"Title: {city.Title}, Latitude: {city.Location.Latitude}, Longitude: {city.Location.Longitude}");
-                        }
-
-                        MessageBox.Show(sb.ToString(), "City Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (JsonReaderException ex)
-                    {
-                        MessageBox.Show($"Ошибка при разборе JSON: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Ошибка при получении данных из API", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                value.Invoke();
             }
-
-            //if (_selectedRadioButton is not null && RadioButtonActions
-            //    .TryGetValue(_selectedRadioButton, out Action value))
-            //{
-            //    //ExportButton.Enabled = true;
-            //    value.Invoke();
-            //}
-            //else
-            //{
-            //    MessageBox.Show(this, "Не выбран целевой сервис для создания фидов.", "Внимание",
-            //                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //}
+            else
+            {
+                MessageBox.Show(this, "Не выбран целевой сервис для создания фидов.", "Внимание",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         /// <summary>
@@ -247,10 +158,10 @@ namespace ConverserWF
                     }
 
                     FeedCreatorProgressBar.Value++;
-                    citySeparatorResult.Categories.Add(selectedCategory); 
+                    citySeparatorResult.Categories.Add(selectedCategory);
                 }
 
-                createXml(Path.GetDirectoryName(_filePathExport), citySeparatorResult);
+                createXml(_filePathExport, citySeparatorResult);
                 FeedCreatorProgressBar.Value = 0;
                 _logger.LogInformation("Генерация XML-файлов завершена.");
             }
@@ -279,63 +190,163 @@ namespace ConverserWF
         }
 
         /// <summary>
-        /// Обработчик события Click для кнопки DataLoadButton.
+        /// Изменяет состояние активности кнопки Загрузить в зависимости от валидности URL
         /// </summary>
-        /// <param name="sender">Объект, вызвавший событие.</param>
-        /// <param name="e">Аргументы события Click.</param>
-        private void DataLoadButton_Click(object sender, EventArgs e)
+        private void SwitchLoadButtonState(object sender, EventArgs e)
         {
-            try
+            if (ApiUrlInput.Text.Length > 0 && ValidateApiUrl())
             {
-                CategoryTreePanel.Nodes.Clear();
-                CategoryTreePanel.CheckBoxes = true;
-
-                CheckAllBoxes.Enabled = true;
-                CheckAllBoxes.Checked = false;
-
-                // TODO: Перенести проверку валидности формата 
-                // содержимого файла внутрь парсера. Если формат не 
-                // соответствует, то вернуть null.
-
-                var products = _parser.GetXLSXFile(_filePathImport);
-                _cityDictionary = _separator.SeparateByCity(products);
-
-                DataLoadProgressBar.Visible = true;
-                DataLoadProgressBar.Maximum = _cityDictionary.Categories
-                    .Count(c => string.IsNullOrEmpty(c.ParentID));
-
-                foreach (var category in _cityDictionary.Categories.Where(c => c.ParentID == null))
-                {
-                    var rootNode = new TreeNode($"{category.Value} [{category.ID}]")
-                    {
-                        Tag = category
-                    };
-
-                    BuildCategoryTree(category, rootNode.Nodes);
-
-                    CategoryTreePanel.Nodes.Add(rootNode);
-
-                    DataLoadProgressBar.Value++;
-                }
-
-                DataLoadProgressBar.Hide();
-                DataLoadButton.Text = "Загружено успешно!";
-                FileSizeLabel.Text = $"Размер файла: {GetFormatFileSize(_filePathImport)}";
-                CategoryTreePanel.ExpandAll();
-                DataLoadButton.Enabled = false;
-                CheckAllBoxes.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
+                LoadButton.Enabled = true;
             }
-            catch (InvalidOperationException ex)
+            else
             {
-
-                MessageBox.Show(this, ex.Message, "Внимание",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                ResetButton_Click(this, new EventArgs());
+                LoadButton.Enabled = false;
             }
         }
 
         /// <summary>
-        /// Представляет размер файла в надлежащем формате
+        /// Проверка пользовательского ввода URL на соответствие паттерну
+        /// </summary>
+        /// <returns></returns>
+        private bool ValidateApiUrl()
+        {
+            if (string.IsNullOrWhiteSpace(ApiUrlInput.Text))
+            {
+                return false;
+            }
+
+            if (!Uri.TryCreate(ApiUrlInput.Text, UriKind.Absolute, out Uri uriResult) ||
+                  uriResult.Scheme != Uri.UriSchemeHttps)
+            {
+                return false;
+            }
+
+            string host = uriResult.Host;
+
+            return host.Contains('.') && !host.StartsWith('.') && !host.EndsWith('.');
+        }
+
+        /// <summary>
+        /// Обращается к данным о городах по API 
+        /// </summary>
+        private async void GetApiCitiesData(object sender, EventArgs e)
+        {
+            if (ValidateApiUrl())
+            {
+                JsonRoot citiesData = await _jsonApiDataService.GetCities(ApiUrlInput.Text);
+
+                if (citiesData is not null && citiesData?.Data.List is not null)
+                {
+                    var sb = new StringBuilder("Список городов: \n\n");
+
+                    foreach (var city in citiesData.Data.List)
+                    {
+                        sb.AppendLine($"Город: {city.Title}");
+                        sb.AppendLine($"ID: {city.Id}");
+                        sb.AppendLine($"Координаты: {city.Location.Latitude}, {city.Location.Longitude}");
+                        sb.AppendLine($"Часовой пояс: {city.Timezone}");
+                        sb.AppendLine($"ID меню: {city.IdMenu}");
+                        sb.AppendLine($"Транслитерация: {city.Slug}");
+                        sb.AppendLine($"Даты только онлайн оплаты: {city.OnlyOnlinePaymentDays}");
+                        sb.AppendLine();
+                    }
+
+                    MessageBox.Show(sb.ToString(), "Cities Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось загрузить данные", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Некорректный адрес", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Обработчик события Click для кнопки LoadButton.
+        /// </summary>
+        /// <param name="sender">Объект, вызвавший событие.</param>
+        /// <param name="e">Аргументы события Click.</param>
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+            if (tabControl.SelectedTab.Name == "Excel")
+            {
+                if (_filePathImport is not null)
+                {
+                    try
+                    {
+                        CategoryTreePanel.Nodes.Clear();
+                        CategoryTreePanel.CheckBoxes = true;
+
+                        CheckAllBoxes.Enabled = true;
+                        CheckAllBoxes.Checked = false;
+
+                        try
+                        {
+                            var products = _parser.GetXLSXFile(_filePathImport);
+
+                            if (products == null)
+                            {
+                                throw new InvalidOperationException("Файл Excel не соответствует ожидаемому формату.");
+                            }
+
+                            _cityDictionary = _separator.SeparateByCity(products);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            MessageBox.Show(this, ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            ResetButton_Click(this, new EventArgs());
+                            return;
+                        }
+
+                        DataLoadProgressBar.Visible = true;
+                        DataLoadProgressBar.Maximum = _cityDictionary.Categories
+                            .Count(c => string.IsNullOrEmpty(c.ParentID));
+
+                        foreach (var category in _cityDictionary.Categories.Where(c => c.ParentID == null))
+                        {
+                            var rootNode = new TreeNode($"{category.Value} [{category.ID}]")
+                            {
+                                Tag = category
+                            };
+
+                            BuildCategoryTree(category, rootNode.Nodes);
+
+                            CategoryTreePanel.Nodes.Add(rootNode);
+
+                            DataLoadProgressBar.Value++;
+                        }
+
+                        DataLoadProgressBar.Hide();
+                        LoadButton.Text = "Загружено успешно!";
+                        FileSizeLabel.Text = $"Размер файла: {GetFormatFileSize(_filePathImport)}";
+                        CategoryTreePanel.ExpandAll();
+                        LoadButton.Enabled = false;
+                        CheckAllBoxes.Text = $"Выбрать все (всего: {_cityDictionary.Categories.Count})";
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        MessageBox.Show(this, ex.Message, "Внимание",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        ResetButton_Click(this, new EventArgs());
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(this, "Не выбран файл Excel.", "Внимание",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }          
+            if (tabControl.SelectedTab.Name == "API")
+            {
+                GetApiCitiesData(sender, e);
+            }
+        }
+
+        /// <summary>
+        /// Представляет размер файла в удобном для чтения формате
         /// </summary>
         /// <param name="filePath">Путь к файлу.</param>
         /// <returns>Размер файла типа string.</returns>
@@ -533,18 +544,18 @@ namespace ConverserWF
 
                 if (dialogResult == DialogResult.OK)
                 {
-                    if(_filePathImport != openFileDialog.FileName)
+                    if (_filePathImport != openFileDialog.FileName)
                     {
                         if (!string.IsNullOrEmpty(_filePathImport))
                         {
                             ClearUIState();
                         }
 
-                        _filePathImport = openFileDialog.FileName;                     
+                        _filePathImport = openFileDialog.FileName;
                         _filePathExport = Path.GetDirectoryName(_filePathImport);
                         BrowseDirectoryExportField.Text = _filePathExport;
                         ProcessFile(_filePathImport);
-                    }  
+                    }
 
                     BrowseDirectoryImportField.Text = _filePathImport;
                 }
@@ -586,12 +597,12 @@ namespace ConverserWF
         {
             if (IsExcelFile(selectedFile))
             {
-                DataLoadButton.Enabled = true;
+                LoadButton.Enabled = true;
             }
             else
             {
                 MessageBox.Show($"Выбранный файл не является файлом Excel:\n{selectedFile}");
-                DataLoadButton.Enabled = false;
+                LoadButton.Enabled = false;
             }
         }
 
@@ -599,7 +610,7 @@ namespace ConverserWF
         /// Обработчик события Click для контрола сброса данных в полях формы либо присваивания им 
         /// значений по умолчанию.
         /// </summary>
-        // <param name="sender">Объект, вызвавший событие.</param>
+        /// <param name="sender">Объект, вызвавший событие.</param>
         /// <param name="e">Аргументы события Click.</param>
         private void ResetButton_Click(object sender, EventArgs e)
         {
@@ -607,23 +618,25 @@ namespace ConverserWF
             _filePathImport = null;
             BrowseDirectoryExportField.Text = string.Empty;
             BrowseDirectoryImportField.Text = string.Empty;
-            DataLoadButton.Enabled = false;          
+            ApiUrlInput.Text = string.Empty;
+            LoadButton.Enabled = false;
             ClearUIState();
         }
 
         /// <summary>
-        /// 
+        /// Обнуляет состояние интерфейса
         /// </summary>
         private void ClearUIState()
         {
-            DataLoadButton.Text = "Загрузить данные"; 
-            CheckAllBoxes.Checked = false; 
-            CheckAllBoxes.Enabled = false; 
-            CheckAllBoxes.Text = "Выбрать все"; 
-            CategoryTreePanel.Nodes.Clear(); 
-            DataLoadProgressBar.Visible = false; 
-            DataLoadProgressBar.Value = 0; 
-            FeedCreatorProgressBar.Value = 0; 
+            LoadButton.Text = "Загрузить данные";
+            ExportButton.Enabled = false;
+            CheckAllBoxes.Checked = false;
+            CheckAllBoxes.Enabled = false;
+            CheckAllBoxes.Text = "Выбрать все";
+            CategoryTreePanel.Nodes.Clear();
+            DataLoadProgressBar.Visible = false;
+            DataLoadProgressBar.Value = 0;
+            FeedCreatorProgressBar.Value = 0;
             FileSizeLabel.Text = "";
             UpdateRadioButtonState();
         }
@@ -640,6 +653,11 @@ namespace ConverserWF
             {
                 radioButton.Enabled = anyChecked;
                 radioButton.Checked = anyChecked && radioButton.Checked;
+            }
+
+            if (!anyChecked)
+            {
+                _selectedRadioButton = null;
             }
 
             if (_selectedRadioButton is not null)

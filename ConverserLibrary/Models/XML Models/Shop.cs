@@ -22,19 +22,19 @@ namespace ConverserLibrary.Models
         /// Получает имя узла магазина.
         /// </summary>
         [XmlElement("name")]
-        public string Name { get; set; } /*= "MYBOX";*/
+        public string Name { get; set; } = "MYBOX";
 
         /// <summary>
         /// Получает название компании.
         /// </summary>
         [XmlElement("company")]
-        public string Company { get; set; } /*= "MYBOX";*/
+        public string Company { get; set; } = "MYBOX";
 
         // <summary>
         /// Получает URL магазина.
         /// </summary>
         [XmlElement("url")]
-        public string Url { get; set; } /*= "https://mybox.ru";*/
+        public string Url { get; set; } = "https://mybox.ru";
 
         /// <summary>
         /// Получает список валют магазина.

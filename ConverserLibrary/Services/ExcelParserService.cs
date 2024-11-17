@@ -2,6 +2,7 @@
 using ConverserLibrary.Interfaces;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
+using System.Globalization;
 
 namespace ConverserLibrary
 {
@@ -90,7 +91,8 @@ namespace ConverserLibrary
             var commaIndex = value.IndexOf(',');
             int index = dotIndex > 0 ? dotIndex : (commaIndex > 0 ? commaIndex : value.Length);
             value = value.Substring(0, index);
-            if (double.TryParse(value, out double numericValue))
+
+            if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out double numericValue))
             {
                 return numericValue.ToString("0.#");
             }
@@ -117,6 +119,11 @@ namespace ConverserLibrary
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
+                foreach (var field in _fields.Values)
+                {
+                    field.Position = 0;
+                }
+
                 var nameDict = _fields
                     .GroupBy(i => i.Value.Name)
                     .ToDictionary(i => i.Key, i => i.FirstOrDefault().Value);
@@ -135,7 +142,7 @@ namespace ConverserLibrary
                 {
                     if (field.Position == 0)
                     {
-                        throw new InvalidOperationException("Выбранный файл Excel не подходит для создания фидов.");
+                        return null;
                     }
                 }
 
@@ -245,5 +252,4 @@ namespace ConverserLibrary
         }
     }
 }
-
 
