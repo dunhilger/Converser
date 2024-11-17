@@ -64,6 +64,7 @@
             panel15 = new Panel();
             panel16 = new Panel();
             RadioButtonPanel = new Panel();
+            GetCitiesDataButton = new Button();
             ExportButton = new Button();
             RadioButtonVK = new RadioButton();
             RadioButton2gis = new RadioButton();
@@ -462,6 +463,7 @@
             // RadioButtonPanel
             // 
             RadioButtonPanel.BackColor = Color.Transparent;
+            RadioButtonPanel.Controls.Add(GetCitiesDataButton);
             RadioButtonPanel.Controls.Add(ExportButton);
             RadioButtonPanel.Controls.Add(RadioButtonVK);
             RadioButtonPanel.Controls.Add(RadioButton2gis);
@@ -476,6 +478,17 @@
             RadioButtonPanel.Name = "RadioButtonPanel";
             RadioButtonPanel.Size = new Size(685, 234);
             RadioButtonPanel.TabIndex = 24;
+            // 
+            // GetCitiesDataButton
+            // 
+            GetCitiesDataButton.ForeColor = Color.Black;
+            GetCitiesDataButton.Location = new Point(458, 94);
+            GetCitiesDataButton.Name = "GetCitiesDataButton";
+            GetCitiesDataButton.Size = new Size(211, 44);
+            GetCitiesDataButton.TabIndex = 21;
+            GetCitiesDataButton.Text = "Данные по городам";
+            GetCitiesDataButton.UseVisualStyleBackColor = true;
+            GetCitiesDataButton.Click += GetApiCitiesData_Click;
             // 
             // ExportButton
             // 
@@ -647,5 +660,6 @@
         private TabPage Excel;
         private TabPage API;
         private TextBox textBox1;
+        private Button GetCitiesDataButton;
     }
 }

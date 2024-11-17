@@ -2,8 +2,13 @@
 using ConverserLibrary.Dto;
 using ConverserLibrary.Interfaces;
 using ConverserLibrary.Models;
+using ConverserLibrary.Models.JSON_Models;
+using ConverserLibrary.Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -13,6 +18,7 @@ namespace ConverserWF
     {
         private readonly ILogger<MainForm> _logger;
         private readonly IExcelParserService _parser;
+        private readonly IJsonApiDataService _jsonApiDataService;
         private readonly ICitySeparatorService _separator;
         private readonly IYandexFeedCreatorService _yandexFeedCreatorService;
         private readonly ITwoGisFeedCreatorService _twoGisFeedCreatorService;
@@ -47,6 +53,7 @@ namespace ConverserWF
         /// <param name="vkFeedCreatorService">Интерфейс сервиса для создания XML-фидов Вконтакте</param>
         public MainForm(ILogger<MainForm> logger,
             IExcelParserService parser,
+            IJsonApiDataService jsonApiDataService,
             ICitySeparatorService separator,
             IYandexFeedCreatorService yandexFeedCreatorService,
             ITwoGisFeedCreatorService twoGisFeedCreatorService,
@@ -57,16 +64,17 @@ namespace ConverserWF
             UpdateRadioButtonState();
             _logger = logger;
             _parser = parser;
+            _jsonApiDataService = jsonApiDataService;
             _separator = separator;
             _yandexFeedCreatorService = yandexFeedCreatorService;
             _twoGisFeedCreatorService = twoGisFeedCreatorService;
             _vkFeedCreatorService = vkFeedCreatorService;
-            RadioButtonActions.Add(RadioButtonYandex, () => HandleFeedButtonClick(_yandexFeedCreatorService.CreateXml));
-            RadioButtonActions.Add(RadioButton2gis, () => HandleFeedButtonClick(_twoGisFeedCreatorService.CreateXml));
-            RadioButtonActions.Add(RadioButtonVK, () => HandleFeedButtonClick(_vkFeedCreatorService.CreateXml));
+            RadioButtonActions.Add(RadioButtonYandex, () => HandleFidButtonClick(_yandexFeedCreatorService.CreateXml));
+            RadioButtonActions.Add(RadioButton2gis, () => HandleFidButtonClick(_twoGisFeedCreatorService.CreateXml));
+            RadioButtonActions.Add(RadioButtonVK, () => HandleFidButtonClick(_vkFeedCreatorService.CreateXml));
             DataLoadButton.Enabled = false;
             CheckAllBoxes.Enabled = false;
-            ExportButton.Enabled = true;
+            ExportButton.Enabled = false; 
         }
 
         private void OnXmlCreated(object sender, XmlCreatedEventArgs e)
@@ -95,49 +103,31 @@ namespace ConverserWF
             }
         }
 
-        class DataList
+        private async void GetApiCitiesData_Click(object sender, EventArgs e)
         {
-            [JsonPropertyName("list")]
-            public List<City> List { get; set; }
-        }
+            var citiesData = await _jsonApiDataService.GetCities();
+            if (citiesData is not null && citiesData.Data?.List is not null)
+            {
+                var messageBuilder = new StringBuilder("Список городов:\n\n");
 
-        class Root
-        {
-            [JsonPropertyName("data")]
-            public DataList Data { get; set; }
-        }
+                foreach (var city in citiesData.Data.List)
+                {
+                    messageBuilder.AppendLine($"Город: {city.Title}");
+                    messageBuilder.AppendLine($"ID: {city.Id}");
+                    messageBuilder.AppendLine($"ID Menu: {city.IdMenu}");
+                    messageBuilder.AppendLine($"Координаты: {city.Location.Latitude}, {city.Location.Longitude}");
+                    messageBuilder.AppendLine($"Часовой пояс: {city.Timezone}");
+                    messageBuilder.AppendLine($"Транслитерация: {city.Slug}");
+                    messageBuilder.AppendLine($"Даты только онлайн оплаты: {city.OnlyOnlinePaymentDays}");
+                    messageBuilder.AppendLine();
+                }
 
-        class Location
-        {
-            [JsonPropertyName("latitude")]
-            public double Latitude { get; set; }
-
-            [JsonPropertyName("longitude")]
-            public double Longitude { get; set; }
-        }
-
-        class City
-        {
-            [JsonPropertyName("id")]
-            public string Id { get; set; }
-
-            [JsonPropertyName("idMenu")]
-            public string IdMenu { get; set; }
-
-            [JsonPropertyName("title")]
-            public string Title { get; set; }
-
-            [JsonPropertyName("location")]
-            public Location Location { get; set; }
-
-            [JsonPropertyName("timezone")]
-            public int Timezone { get; set; }
-
-            [JsonPropertyName("slug")]
-            public string Slug { get; set; }
-
-            [JsonPropertyName("onlyOnlinePaymentDays")]
-            public object OnlyOnlinePaymentDays { get; set; }
+                MessageBox.Show(messageBuilder.ToString(), "Cities Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Не удалось загрузить данные.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
@@ -145,65 +135,19 @@ namespace ConverserWF
         /// </summary>
         /// <param name="sender">Объект, вызвавший событие.</param>
         /// <param name="e">Аргументы события Click.</param>
-        private async void ExportButton_Click(object sender, EventArgs e)
+        private void ExportButton_Click(object sender, EventArgs e)
         {
-            //using (var client = new HttpClient())
-            //{
-            //    var response = await client.GetAsync("https://catfact.ninja/fact");
-
-            //    var content = await response.Content.ReadAsStringAsync();
-
-            //    var model = JsonSerializer.Deserialize<CatModel>(content);
-
-            //    MessageBox.Show(model.Fact);
-            //}
-
-            using (var client = new HttpClient())
+            if (_selectedRadioButton is not null && RadioButtonActions
+                .TryGetValue(_selectedRadioButton, out Action value))
             {
-                var response = await client.GetAsync("https://mybile-stage.mybox.ru/api/v1/cities");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    MessageBox.Show(content, "Response Content", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    try
-                    {
-                        var root = JsonConvert.DeserializeObject<Root>(content);
-
-                        List<City> cities = root.Data.List;
-
-                        StringBuilder sb = new StringBuilder();
-                        foreach (var city in cities)
-                        {
-                            sb.AppendLine($"Title: {city.Title}, Latitude: {city.Location.Latitude}, Longitude: {city.Location.Longitude}");
-                        }
-
-                        MessageBox.Show(sb.ToString(), "City Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (JsonReaderException ex)
-                    {
-                        MessageBox.Show($"Ошибка при разборе JSON: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Ошибка при получении данных из API", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                //ExportButton.Enabled = true;
+                value.Invoke();
             }
-
-            //if (_selectedRadioButton is not null && RadioButtonActions
-            //    .TryGetValue(_selectedRadioButton, out Action value))
-            //{
-            //    //ExportButton.Enabled = true;
-            //    value.Invoke();
-            //}
-            //else
-            //{
-            //    MessageBox.Show(this, "Не выбран целевой сервис для создания фидов.", "Внимание",
-            //                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //}
+            else
+            {
+                MessageBox.Show(this, "Не выбран целевой сервис для создания фидов.", "Внимание",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         /// <summary>
@@ -211,7 +155,7 @@ namespace ConverserWF
         /// сигнатуре метода CreateXml.
         /// </summary>
         /// <param name="createXml">Метод создания XML-файлов</param>
-        private void HandleFeedButtonClick(Action<string, CitySeparatorResult> createXml)
+        private void HandleFidButtonClick(Action<string, CitySeparatorResult> createXml)
         {
             var selectedCategories = GetAllCheckedNodes(CategoryTreePanel.Nodes)
             .Select(node => node.Tag as Category)
@@ -292,10 +236,6 @@ namespace ConverserWF
 
                 CheckAllBoxes.Enabled = true;
                 CheckAllBoxes.Checked = false;
-
-                // TODO: Перенести проверку валидности формата 
-                // содержимого файла внутрь парсера. Если формат не 
-                // соответствует, то вернуть null.
 
                 var products = _parser.GetXLSXFile(_filePathImport);
                 _cityDictionary = _separator.SeparateByCity(products);

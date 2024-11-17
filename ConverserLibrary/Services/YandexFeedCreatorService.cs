@@ -117,7 +117,8 @@ public class YandexFeedCreatorService : IYandexFeedCreatorService
                 {
                     ID = product.BitrixCode,
                     Model = product.CommercialName,
-                    Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}", 
+                    //Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{transliteratedName}", // вернуть этот вариант после правок на стороне Битрикс
+                    Url = $"https://mybox.ru/{_transliterationService.Transliterate(cityName)}/products/{product.BitrixCode}/?utm_source=search&utm_medium=free&utm_campaign=yandex_feed_free", // Временный вариант ссылок 
                     Price = product.Price,
                     CurrencyId = product.Currency,
                     CategoryId = product.CategoryId,

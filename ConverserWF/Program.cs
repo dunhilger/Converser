@@ -21,6 +21,7 @@ namespace ConverserWF
             var serviceProvider = new ServiceCollection()
                 .AddLogging(lb => lb.AddSerilog(dispose: true))
                 .AddSingleton<IExcelParserService, ExcelParserService>()
+                .AddSingleton<IJsonApiDataService, JsonApiDataService>()
                 .AddSingleton<ICitySeparatorService, CitySeparatorService>()
                 .AddSingleton<IYandexFeedCreatorService, YandexFeedCreatorService>()
                 .AddSingleton<ITwoGisFeedCreatorService, TwoGisFeedCreatorService>()
