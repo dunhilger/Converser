@@ -1,4 +1,5 @@
 ﻿using ConverserLibrary.Models.JSON_Models;
+using ConverserLibrary.Services;
 
 namespace ConverserLibrary.Interfaces
 {
@@ -11,6 +12,6 @@ namespace ConverserLibrary.Interfaces
         /// Получает список городов из Json по указанному url.
         /// </summary>
         /// <returns></returns>
-        public Task<JsonRoot> GetCities(string url)
+        public Task<CitiesResult> GetCities(string url)
 ;    }
 }

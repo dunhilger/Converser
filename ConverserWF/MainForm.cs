@@ -233,7 +233,15 @@ namespace ConverserWF
         {
             if (ValidateApiUrl())
             {
-                JsonRoot citiesData = await _jsonApiDataService.GetCities(ApiUrlInput.Text);
+                var citiesResult = await _jsonApiDataService.GetCities(ApiUrlInput.Text);
+
+                if (!citiesResult.Success)
+                {
+                    MessageBox.Show(citiesResult.ErrorMessage, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var citiesData = citiesResult.JsonRoot;
 
                 if (citiesData is not null && citiesData?.Data.List is not null)
                 {
