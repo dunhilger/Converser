@@ -85,7 +85,7 @@
             // BrowseFileText
             // 
             BrowseFileText.BackColor = Color.WhiteSmoke;
-            BrowseFileText.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
+            BrowseFileText.Font = new Font("Century Gothic", 10.8F);
             BrowseFileText.ForeColor = Color.SteelBlue;
             BrowseFileText.Location = new Point(57, 10);
             BrowseFileText.Name = "BrowseFileText";
@@ -97,7 +97,7 @@
             // 
             label2.AutoSize = true;
             label2.BackColor = Color.WhiteSmoke;
-            label2.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
+            label2.Font = new Font("Century Gothic", 10.8F);
             label2.ForeColor = Color.SteelBlue;
             label2.Location = new Point(57, 174);
             label2.Name = "label2";
@@ -109,7 +109,7 @@
             // 
             label1.AutoSize = true;
             label1.BackColor = Color.WhiteSmoke;
-            label1.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
+            label1.Font = new Font("Century Gothic", 10.8F);
             label1.ForeColor = Color.SteelBlue;
             label1.Location = new Point(772, 9);
             label1.Name = "label1";
@@ -121,7 +121,7 @@
             // 
             label3.AutoSize = true;
             label3.BackColor = Color.WhiteSmoke;
-            label3.Font = new Font("Century Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
+            label3.Font = new Font("Century Gothic", 10.8F);
             label3.ForeColor = Color.SteelBlue;
             label3.Location = new Point(772, 175);
             label3.Name = "label3";
@@ -143,7 +143,7 @@
             // BrowseDirectoryExportField
             // 
             BrowseDirectoryExportField.BackColor = Color.White;
-            BrowseDirectoryExportField.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            BrowseDirectoryExportField.Font = new Font("Tahoma", 10.2F);
             BrowseDirectoryExportField.ForeColor = Color.DimGray;
             BrowseDirectoryExportField.Location = new Point(20, 29);
             BrowseDirectoryExportField.Name = "BrowseDirectoryExportField";
@@ -168,7 +168,7 @@
             // 
             LoadButton.AccessibleName = "";
             LoadButton.BackColor = Color.White;
-            LoadButton.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            LoadButton.Font = new Font("Tahoma", 10.2F);
             LoadButton.ForeColor = Color.Black;
             LoadButton.Location = new Point(482, 59);
             LoadButton.Name = "LoadButton";
@@ -248,7 +248,7 @@
             // 
             tabControl.Controls.Add(Excel);
             tabControl.Controls.Add(API);
-            tabControl.Font = new Font("Century Gothic", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            tabControl.Font = new Font("Century Gothic", 10.2F);
             tabControl.Location = new Point(21, 28);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
@@ -271,7 +271,7 @@
             // 
             BrowseDirectoryImportField.AllowDrop = true;
             BrowseDirectoryImportField.BackColor = Color.White;
-            BrowseDirectoryImportField.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            BrowseDirectoryImportField.Font = new Font("Tahoma", 10.2F);
             BrowseDirectoryImportField.ForeColor = Color.DimGray;
             BrowseDirectoryImportField.Location = new Point(6, 14);
             BrowseDirectoryImportField.Name = "BrowseDirectoryImportField";
@@ -308,7 +308,7 @@
             // 
             // ApiUrlInput
             // 
-            ApiUrlInput.Font = new Font("Tahoma", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            ApiUrlInput.Font = new Font("Tahoma", 10.2F);
             ApiUrlInput.ForeColor = Color.DimGray;
             ApiUrlInput.Location = new Point(18, 17);
             ApiUrlInput.Name = "ApiUrlInput";
@@ -589,7 +589,7 @@
             Controls.Add(BrowseFileText);
             Controls.Add(panel4);
             Controls.Add(panel9);
-            Font = new Font("Segoe UI", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
+            Font = new Font("Segoe UI", 10.2F);
             ForeColor = Color.Transparent;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");

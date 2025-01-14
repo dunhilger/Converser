@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace ConverserLibrary.Models
 {
     public class JsonCityLocation
     {
-        [JsonPropertyName("latitude")]
+        [JsonProperty("latitude")]
         public double Latitude { get; set; }
 
-        [JsonPropertyName("longitude")]
+        [JsonProperty("longitude")]
         public double Longitude { get; set; }
     }
 }

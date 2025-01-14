@@ -1,28 +1,31 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace ConverserLibrary.Models.JSON_Models
 {
     public class JsonCity
     {
-        [JsonPropertyName("id")]
+        [JsonProperty("id")]
         public string Id { get; set; }
 
-        [JsonPropertyName("idMenu")]
+        [JsonProperty("idMenu")]
         public string IdMenu { get; set; }
 
-        [JsonPropertyName("title")]
+        [JsonProperty("title")]
         public string Title { get; set; }
 
-        [JsonPropertyName("location")]
+        [JsonProperty("location")]
         public JsonCityLocation Location { get; set; }
 
-        [JsonPropertyName("timezone")]
+        [JsonProperty("timezone")]
         public int Timezone { get; set; }
 
-        [JsonPropertyName("slug")]
+        [JsonProperty("slug")]
         public string Slug { get; set; }
 
-        [JsonPropertyName("onlyOnlinePaymentDays")]
+        [JsonProperty("onlyOnlinePaymentDays")]
         public object OnlyOnlinePaymentDays { get; set; }
+
+        [JsonProperty("isNewLoyaltyProgram")]
+        public bool IsNewLoyaltyProgram { get; set; }
     }
 }

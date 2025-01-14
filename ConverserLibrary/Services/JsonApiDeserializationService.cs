@@ -6,24 +6,15 @@ using Serilog.Core;
 
 namespace ConverserLibrary.Services
 {
-    public class CitiesResult 
+    public class JsonApiDeserializationService : IJsonApiDeserializationService
     {
-        public bool Success { get; set; }
-
-        public string ErrorMessage { get; set; }
-
-        public JsonRoot JsonRoot { get; set; }
-    }
-
-    public class JsonApiDataService : IJsonApiDataService
-    {
-        public JsonApiDataService(ILogger<JsonApiDataService> logger)
+        public JsonApiDeserializationService(ILogger<JsonApiDeserializationService> logger)
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(Logger));
         }
 
-        private readonly ILogger<JsonApiDataService> _logger;
+        private readonly ILogger<JsonApiDeserializationService> _logger;
 
         public async Task<CitiesResult> GetCities(string url)
         {
@@ -37,11 +28,11 @@ namespace ConverserLibrary.Services
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var content = await response.Content.ReadAsStringAsync();
+                        string content = await response.Content.ReadAsStringAsync();
 
                         var root = JsonConvert.DeserializeObject<JsonRoot>(content);
 
-                        if (root is not null)
+                        if (root.JsonCityDataList is not null)
                         {
                             _logger.LogInformation("Данные о городах успешно загружены");
                             result.JsonRoot = root;

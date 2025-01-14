@@ -6,7 +6,7 @@ namespace ConverserLibrary.Interfaces
     /// <summary>
     /// Интерфейс для сервиса чтения Json.
     /// </summary>
-    public interface IJsonApiDataService
+    public interface IJsonApiDeserializationService
     {
         /// <summary>
         /// Получает список городов из Json по указанному url.

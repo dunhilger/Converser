@@ -12,7 +12,7 @@ namespace ConverserWF
     {
         private readonly ILogger<MainForm> _logger;
         private readonly IExcelParserService _parser;
-        private readonly IJsonApiDataService _jsonApiDataService;
+        private readonly IJsonApiDeserializationService _jsonApiDeserializationService;
         private readonly ICitySeparatorService _separator;
         private readonly IYandexFeedCreatorService _yandexFeedCreatorService;
         private readonly ITwoGisFeedCreatorService _twoGisFeedCreatorService;
@@ -47,7 +47,7 @@ namespace ConverserWF
         /// <param name="vkFeedCreatorService">Интерфейс сервиса для создания XML-фидов Вконтакте</param>
         public MainForm(ILogger<MainForm> logger,
             IExcelParserService parser,
-            IJsonApiDataService jsonApiDataService,
+            IJsonApiDeserializationService jsonApiDataService,
             ICitySeparatorService separator,
             IYandexFeedCreatorService yandexFeedCreatorService,
             ITwoGisFeedCreatorService twoGisFeedCreatorService,
@@ -58,7 +58,7 @@ namespace ConverserWF
             UpdateRadioButtonState();
             _logger = logger;
             _parser = parser;
-            _jsonApiDataService = jsonApiDataService;
+            _jsonApiDeserializationService = jsonApiDataService;
             _separator = separator;
             _yandexFeedCreatorService = yandexFeedCreatorService;
             _twoGisFeedCreatorService = twoGisFeedCreatorService;
@@ -226,6 +226,49 @@ namespace ConverserWF
             return host.Contains('.') && !host.StartsWith('.') && !host.EndsWith('.');
         }
 
+        private async void GetCityMenu() // изменить для десериализации меню
+        {
+            if (ValidateApiUrl())
+            {
+                var cityMenuResult = await _jsonApiDeserializationService.GetCities(ApiUrlInput.Text);
+
+                if (!cityMenuResult.Success)
+                {
+                    MessageBox.Show(cityMenuResult.ErrorMessage, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var citiesData = cityMenuResult.JsonRoot;
+
+                if (citiesData is not null && citiesData?.JsonCityDataList.CityList is not null)
+                {
+                    var sb = new StringBuilder("Список городов: \n\n");
+
+                    foreach (var city in citiesData.JsonCityDataList.CityList)
+                    {
+                        sb.AppendLine($"Город: {city.Title}");
+                        sb.AppendLine($"ID: {city.Id}");
+                        sb.AppendLine($"Координаты: {city.Location.Latitude}, {city.Location.Longitude}");
+                        sb.AppendLine($"Часовой пояс: {city.Timezone}");
+                        sb.AppendLine($"ID меню: {city.IdMenu}");
+                        sb.AppendLine($"Транслитерация: {city.Slug}");
+                        sb.AppendLine($"Даты только онлайн оплаты: {city.OnlyOnlinePaymentDays}");
+                        sb.AppendLine();
+                    }
+
+                    MessageBox.Show(sb.ToString(), "Cities Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось загрузить данные", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Некорректный адрес", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         /// <summary>
         /// Обращается к данным о городах по API 
         /// </summary>
@@ -233,7 +276,7 @@ namespace ConverserWF
         {
             if (ValidateApiUrl())
             {
-                var citiesResult = await _jsonApiDataService.GetCities(ApiUrlInput.Text);
+                var citiesResult = await _jsonApiDeserializationService.GetCities(ApiUrlInput.Text);
 
                 if (!citiesResult.Success)
                 {
@@ -243,11 +286,11 @@ namespace ConverserWF
 
                 var citiesData = citiesResult.JsonRoot;
 
-                if (citiesData is not null && citiesData?.Data.List is not null)
+                if (citiesData?.JsonCityDataList.CityList is not null)
                 {
                     var sb = new StringBuilder("Список городов: \n\n");
 
-                    foreach (var city in citiesData.Data.List)
+                    foreach (var city in citiesData.JsonCityDataList.CityList)
                     {
                         sb.AppendLine($"Город: {city.Title}");
                         sb.AppendLine($"ID: {city.Id}");
@@ -256,6 +299,7 @@ namespace ConverserWF
                         sb.AppendLine($"ID меню: {city.IdMenu}");
                         sb.AppendLine($"Транслитерация: {city.Slug}");
                         sb.AppendLine($"Даты только онлайн оплаты: {city.OnlyOnlinePaymentDays}");
+                        sb.AppendLine($"Новая программа лояльности: {city.IsNewLoyaltyProgram}");
                         sb.AppendLine();
                     }
 
